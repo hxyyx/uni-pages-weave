@@ -32,7 +32,9 @@ npm config set //registry.npmjs.org/:_authToken npm_xxx --location user
 运行：
 
 ```sh
-pnpm run release
+npm run release
+# yarn release
+# pnpm run release
 ```
 
 脚本会依次执行：
