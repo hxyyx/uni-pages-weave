@@ -1,0 +1,3 @@
+{
+  "messagePattern": "contains unsupported keys: subpackage, subPackage"
+}

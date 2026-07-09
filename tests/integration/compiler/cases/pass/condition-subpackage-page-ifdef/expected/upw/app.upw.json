@@ -1,0 +1,9 @@
+{
+  "homePath": "pages/component/view/view",
+  "subpackages": [
+    {
+      "root": "pages/API",
+      "name": "pages/API"
+    }
+  ]
+}

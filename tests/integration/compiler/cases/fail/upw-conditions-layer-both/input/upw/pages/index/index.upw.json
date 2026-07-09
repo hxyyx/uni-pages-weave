@@ -1,0 +1,15 @@
+{
+  "$upw": {
+    "conditions": [
+      {
+        "when": [
+          "h5"
+        ],
+        "unless": [
+          "mp-toutiao"
+        ]
+      }
+    ]
+  },
+  "path": "pages/index/index"
+}

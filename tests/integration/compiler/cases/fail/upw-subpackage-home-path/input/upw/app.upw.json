@@ -1,0 +1,4 @@
+{
+  "homePath": "pages/account/profile/profile",
+  "subpackages": [{ "name": "account", "root": "pages/account" }]
+}

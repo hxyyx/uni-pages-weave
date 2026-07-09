@@ -1,0 +1,6 @@
+{
+  "name": "upw-conditions-too-deep",
+  "kind": "upw-to-uni-error",
+  "input": "input/upw",
+  "expectedError": "expected/error.json"
+}

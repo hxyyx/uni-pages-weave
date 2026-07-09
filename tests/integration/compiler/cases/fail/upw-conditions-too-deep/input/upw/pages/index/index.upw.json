@@ -1,0 +1,22 @@
+{
+  "$upw": {
+    "conditions": [
+      {
+        "when": [
+          "h5"
+        ]
+      },
+      {
+        "when": [
+          "mp-weixin"
+        ]
+      },
+      {
+        "unless": [
+          "mp-toutiao"
+        ]
+      }
+    ]
+  },
+  "path": "pages/index/index"
+}

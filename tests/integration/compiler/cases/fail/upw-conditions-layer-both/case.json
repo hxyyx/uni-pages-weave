@@ -1,0 +1,6 @@
+{
+  "name": "upw-conditions-layer-both",
+  "kind": "upw-to-uni-error",
+  "input": "input/upw",
+  "expectedError": "expected/error.json"
+}

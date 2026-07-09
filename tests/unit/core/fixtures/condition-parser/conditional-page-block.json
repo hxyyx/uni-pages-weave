@@ -1,0 +1,8 @@
+{
+  "pages": [
+    { "path": "pages/index/index" },
+    // #ifdef H5
+    { "path": "pages/h5/index", "style": { "navigationBarTitleText": "H5" } }
+    // #endif
+  ]
+}

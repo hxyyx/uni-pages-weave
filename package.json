@@ -1,0 +1,46 @@
+{
+  "name": "uni-pages-weave",
+  "version": "0.1.0",
+  "private": true,
+  "description": "UPW pages.json compiler toolkit monorepo.",
+  "type": "module",
+  "license": "MIT",
+  "scripts": {
+    "build": "pnpm -r build",
+    "verify": "pnpm run build && pnpm run lint && pnpm run test",
+    "test": "pnpm run test:unit && pnpm run test:integration && pnpm run test:e2e",
+    "test:unit": "tsx --test \"tests/unit/**/*.test.ts\"",
+    "test:integration": "node ./tests/integration/test.mjs",
+    "test:e2e": "node ./tests/e2e/test.mjs",
+    "test:clear": "node ./tests/clear.mjs",
+    "lint": "pnpm -r lint",
+    "format": "prettier \"packages/*/src/**/*.{js,mjs,cjs,ts,tsx,json,md}\" --write",
+    "format:check": "prettier \"packages/*/src/**/*.{js,mjs,cjs,ts,tsx,json,md}\" --check",
+    "changeset:add": "changeset",
+    "changelog": "changeset version",
+    "release": "pnpm run verify && pnpm run release:publish",
+    "release:prepare": "pnpm run verify && pnpm run changelog",
+    "release:publish": "changeset publish",
+    "release:package": "node ./scripts/release-package.mjs"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.27.0",
+    "@eslint/js": "^9.0.0",
+    "@inquirer/prompts": "^7.0.0",
+    "@types/node": "^20.0.0",
+    "eslint": "^9.0.0",
+    "fs-extra": "^11.2.0",
+    "globals": "^15.0.0",
+    "prettier": "^3.0.0",
+    "tsup": "^8.0.0",
+    "tsx": "^4.23.0",
+    "typescript": "^5.4.0",
+    "typescript-eslint": "^8.0.0"
+  },
+  "engines": {
+    "node": ">=18.18.0"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  }
+}

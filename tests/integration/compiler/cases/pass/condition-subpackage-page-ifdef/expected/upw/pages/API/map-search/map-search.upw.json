@@ -1,0 +1,12 @@
+{
+  "$upw": {
+    "subpackageName": "pages/API",
+    "when": [
+      "app-plus"
+    ]
+  },
+  "path": "pages/API/map-search/map-search",
+  "style": {
+    "navigationBarTitleText": "map search"
+  }
+}

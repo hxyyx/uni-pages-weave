@@ -1,0 +1,12 @@
+{
+  "homePath": "pages/index/index",
+  "globalStyle": {
+    "navigationBarTitleText": "Demo"
+  },
+  "subpackages": [
+    {
+      "name": "account",
+      "root": "pages/account"
+    }
+  ]
+}

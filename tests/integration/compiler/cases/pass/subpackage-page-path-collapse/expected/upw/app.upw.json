@@ -1,0 +1,9 @@
+{
+  "homePath": "pages/index/index",
+  "subpackages": [
+    {
+      "root": "pages/account",
+      "name": "pages/account"
+    }
+  ]
+}

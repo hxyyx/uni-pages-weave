@@ -1,0 +1,6 @@
+{
+  "$upw": {
+    "subpackageName": "account"
+  },
+  "path": "pages/account/profile/profile"
+}

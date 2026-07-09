@@ -1,0 +1,31 @@
+{
+  "$upw": {
+    "when": [
+      "app-plus",
+      "mp-weixin",
+      "h5",
+      "mp-baidu"
+    ],
+    "patches": [
+      {
+        "when": [
+          "mp-baidu"
+        ],
+        "patch": {
+          "style": {
+            "usingComponents": {
+              "editor": "dynamicLib://editorLib/editor"
+            }
+          }
+        }
+      }
+    ]
+  },
+  "path": "pages/component/editor/editor",
+  "style": {
+    "navigationBarTitleText": "editor",
+    "app-plus": {
+      "softinputMode": "adjustResize"
+    }
+  }
+}

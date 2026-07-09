@@ -1,0 +1,13 @@
+{
+  "name": "condition-page-or-with-field",
+  "kind": "roundtrip",
+  "input": "input/pages.json",
+  "actual": {
+    "upw": "upw",
+    "pages": "pages.json"
+  },
+  "expected": {
+    "upw": "expected/upw",
+    "pages": "expected/pages.json"
+  }
+}

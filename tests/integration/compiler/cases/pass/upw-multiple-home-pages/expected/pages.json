@@ -1,0 +1,10 @@
+{
+  "pages": [
+    {
+      "path": "pages/home/home"
+    },
+    {
+      "path": "pages/index/index"
+    }
+  ]
+}

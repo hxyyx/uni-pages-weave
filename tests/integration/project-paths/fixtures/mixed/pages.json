@@ -1,0 +1,10 @@
+{
+  "pages": [
+    {
+      "path": "pages/root/index",
+      "style": {
+        "navigationBarTitleText": "pages/root/index"
+      }
+    }
+  ]
+}

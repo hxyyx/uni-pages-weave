@@ -1,0 +1,3 @@
+{
+  "messagePattern": "conditions\\[0\\] cannot define both when and unless"
+}

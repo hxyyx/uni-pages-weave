@@ -1,0 +1,11 @@
+{
+  "name": "upw-lowercase-subpackages-to-uni",
+  "kind": "upw-to-uni",
+  "input": "input/upw",
+  "actual": {
+    "pages": "pages.json"
+  },
+  "expected": {
+    "pages": "expected/pages.json"
+  }
+}

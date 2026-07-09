@@ -1,0 +1,27 @@
+{
+  "globalStyle": {
+    "navigationBarTitleText": "Demo"
+  },
+  "pages": [
+    {
+      "path": "pages/index/index",
+      "style": {
+        "navigationBarTitleText": "Home"
+      }
+    }
+  ],
+  "subPackages": [
+    {
+      "name": "account",
+      "root": "pages/account",
+      "pages": [
+        {
+          "style": {
+            "navigationBarTitleText": "Profile"
+          },
+          "path": "profile/profile"
+        }
+      ]
+    }
+  ]
+}

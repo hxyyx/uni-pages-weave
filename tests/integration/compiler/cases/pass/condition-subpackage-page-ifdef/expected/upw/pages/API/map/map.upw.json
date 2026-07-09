@@ -1,0 +1,9 @@
+{
+  "$upw": {
+    "subpackageName": "pages/API"
+  },
+  "path": "pages/API/map/map",
+  "style": {
+    "navigationBarTitleText": "map"
+  }
+}

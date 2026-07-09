@@ -1,0 +1,15 @@
+{
+  "$upw": {
+    "conditions": [
+      {
+        "when": [
+          "h5"
+        ]
+      }
+    ],
+    "when": [
+      "mp-weixin"
+    ]
+  },
+  "path": "pages/index/index"
+}
