@@ -37,11 +37,11 @@ npm run <script>
 
 | 脚本                      | 说明                                      |
 | ------------------------- | ----------------------------------------- |
-| `npm run changeset:add`   | 创建 changeset。                          |
-| `npm run changelog`       | 根据 changeset 更新版本和 changelog。     |
-| `npm run release:prepare` | 先运行 `verify`，再执行 `changelog`。     |
+| `npm run changeset:add`   | 创建 changeset 风格的变更说明文件。       |
+| `npm run release:prepare` | 先运行 `verify`，再生成版本和 changelog。 |
+| `npm run release:quick`   | 先运行 `verify`，再生成版本并发布。       |
 | `npm run release:publish` | 执行 `changeset publish`。                |
-| `npm run release`         | 先运行 `verify`，再发布所有待发布包。     |
-| `npm run release:package` | 交互式选择一个可发布 workspace 包并发布。 |
+| `npm run release`         | 等同于 `npm run release:quick`。          |
+| `npm run version:check`   | 检查根包和所有 workspace 包版本一致。     |
 
 发布细节见 [发布流程](./release.md)。

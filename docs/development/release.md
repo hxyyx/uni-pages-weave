@@ -1,6 +1,6 @@
 # 发布流程
 
-仓库使用 changesets 管理版本，workspace 包采用固定版本组：
+仓库使用 changesets 收集变更说明，并通过自定义发布脚本统一管理版本。所有 workspace 包始终使用同一个版本号，并默认一起发布：
 
 - `@uni-pages-weave/core`
 - `@uni-pages-weave/cli`
@@ -9,56 +9,52 @@
 
 ## 准备 changeset
 
-有面向用户的变更时，先创建 changeset：
+有面向用户的变更时，先创建 changeset 风格的变更说明文件：
 
 ```sh
 npm run changeset:add
 ```
 
-选择受影响的包和版本级别，并填写变更说明。
+脚本会在 `.changeset/` 下生成 Markdown 文件，并自动写入全部发布包。只需要编辑正文变更说明，不需要选择包，也不需要选择版本级别。
 
-## 发布前检查
+发布时如果没有 pending changeset，或变更说明正文为空，流程会中止。
 
-发布前运行完整验证：
+## 快速发布
+
+常规发布使用：
 
 ```sh
-npm run verify
+npm run release:quick
 ```
 
-该脚本会依次执行构建、lint、单元测试、集成测试和 e2e 测试。
+脚本会先运行完整验证，然后交互选择本次发布的 SemVer 级别：
 
-## 生成版本变更
+- `patch`：修复或小改动。
+- `minor`：向后兼容的新能力。
+- `major`：破坏性变更。
 
-准备发布分支时运行：
+选择后脚本会把所有 pending changeset 统一改成本次选择的版本级别，调用 changesets 插件生成日志内容，并聚合写入根目录 `CHANGELOG.md`。
+
+## 准备发布
+
+如果需要先生成版本和 changelog，人工确认后再发布：
 
 ```sh
 npm run release:prepare
 ```
 
-该脚本会先运行 `verify`，再通过 changesets 更新包版本和 changelog。
+确认无误后运行：
 
-## 发布所有待发布包
+```sh
+npm run release:publish
+```
 
-确认版本变更无误后运行：
+## 默认发布命令
+
+`release` 等同于快速发布：
 
 ```sh
 npm run release
 ```
 
-`release` 会再次运行 `verify`，然后执行 `changeset publish`。
-
-## 发布单个包
-
-需要单独发布某个 workspace 包时：
-
-```sh
-npm run release:package
-```
-
-脚本会列出所有非 private workspace 包。选择包号后，它会先运行该包的构建，再执行：
-
-```sh
-npm publish --workspace <package-name> --access public --registry https://registry.npmjs.org/
-```
-
-这个路径适合补发单包；常规发布优先使用 changesets 流程。
+发布流程不提供单包选择入口，避免破坏所有包版本一致的约束。
