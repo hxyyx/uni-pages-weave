@@ -1,6 +1,6 @@
 {
   "name": "uni-pages-weave",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "private": true,
   "description": "UPW pages.json compiler toolkit monorepo.",
   "type": "module",
@@ -16,15 +16,10 @@
     "lint": "pnpm -r lint",
     "format": "prettier \"packages/*/src/**/*.{js,mjs,cjs,ts,tsx,json,md}\" --write",
     "format:check": "prettier \"packages/*/src/**/*.{js,mjs,cjs,ts,tsx,json,md}\" --check",
-    "changeset:add": "node ./scripts/add-change.mjs",
-    "release": "npm run release:quick",
-    "release:prepare": "npm run verify && node ./scripts/release.mjs --no-publish",
-    "release:quick": "npm run verify && node ./scripts/release.mjs && npm run release:publish",
-    "release:publish": "changeset publish",
+    "release": "node ./scripts/release.mjs",
     "version:check": "node ./scripts/check-version-sync.mjs"
   },
   "devDependencies": {
-    "@changesets/cli": "^2.27.0",
     "@eslint/js": "^9.0.0",
     "@inquirer/prompts": "^7.0.0",
     "@types/node": "^20.0.0",

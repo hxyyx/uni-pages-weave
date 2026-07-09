@@ -1,11 +1,20 @@
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
-import { select } from '@inquirer/prompts';
+import { input, select } from '@inquirer/prompts';
 import fs from 'fs-extra';
 
-const CHANGESET_DIR = path.resolve('.changeset');
-const ROOT_CHANGELOG = path.resolve('CHANGELOG.md');
+const NPM_REGISTRY = 'https://registry.npmjs.org/';
+const PACKAGE_SCOPE = '@uni-pages-weave/';
+const ROOT_MANIFEST = path.resolve('package.json');
+const CHANGELOG = path.resolve('CHANGELOG.md');
+const RELEASE_NOTE_DIR = path.resolve('.upw');
 const STABLE_SEMVER = /^(\d+)\.(\d+)\.(\d+)$/;
+const DEPENDENCY_FIELDS = [
+  'dependencies',
+  'devDependencies',
+  'peerDependencies',
+  'optionalDependencies',
+];
 
 function readJson(filePath) {
   return JSON.parse(fs.readFileSync(filePath, 'utf8'));
@@ -13,6 +22,22 @@ function readJson(filePath) {
 
 function writeJson(filePath, value) {
   fs.writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`);
+}
+
+function run(command, args) {
+  const result = spawnSync(command, args, {
+    stdio: 'inherit',
+    shell: process.platform === 'win32',
+  });
+
+  if (result.error) {
+    console.error(result.error.message);
+    process.exit(1);
+  }
+
+  if (result.status !== 0) {
+    process.exit(result.status ?? 1);
+  }
 }
 
 function workspacePackages() {
@@ -28,32 +53,75 @@ function workspacePackages() {
     .map((entry) => {
       const dir = path.join(packagesDir, entry.name);
       const manifestPath = path.join(dir, 'package.json');
-      const manifest = readJson(manifestPath);
 
-      return { dir, manifestPath, manifest };
+      if (!fs.existsSync(manifestPath)) {
+        return null;
+      }
+
+      return {
+        dir,
+        manifestPath,
+        manifest: readJson(manifestPath),
+      };
     })
+    .filter(Boolean)
     .sort((left, right) => left.manifest.name.localeCompare(right.manifest.name));
 }
 
-function assertVersionSync(rootManifest, packages) {
-  const mismatches = packages.filter((item) => item.manifest.version !== rootManifest.version);
+function assertPublishablePackageConfig(packages) {
+  const invalidPackages = [];
 
-  if (mismatches.length > 0) {
-    console.error(`Version mismatch. Root package version is ${rootManifest.version}.`);
+  for (const item of packages) {
+    const { manifest } = item;
 
-    for (const item of mismatches) {
-      console.error(`- ${item.manifest.name}: ${item.manifest.version}`);
+    if (!manifest.name?.startsWith(PACKAGE_SCOPE)) {
+      invalidPackages.push(`${manifest.name ?? item.dir}: name must start with ${PACKAGE_SCOPE}`);
+    }
+
+    if (manifest.publishConfig?.registry !== NPM_REGISTRY) {
+      invalidPackages.push(`${manifest.name}: publishConfig.registry must be ${NPM_REGISTRY}`);
+    }
+
+    if (manifest.publishConfig?.access !== 'public') {
+      invalidPackages.push(`${manifest.name}: publishConfig.access must be public`);
+    }
+  }
+
+  if (invalidPackages.length > 0) {
+    console.error('Publishable package configuration is invalid.');
+
+    for (const message of invalidPackages) {
+      console.error(`- ${message}`);
     }
 
     process.exit(1);
   }
 }
 
+function assertNpmAuth() {
+  const result = spawnSync('npm', ['whoami', '--registry', NPM_REGISTRY], {
+    encoding: 'utf8',
+    shell: process.platform === 'win32',
+    stdio: ['ignore', 'pipe', 'pipe'],
+  });
+
+  if (result.status === 0) {
+    console.log(`npm authenticated as ${result.stdout.trim()}.`);
+    return;
+  }
+
+  console.error('No npm authentication found for the npm registry.');
+  console.error('Configure npm auth with a global granular access token.');
+  console.error('The token must have publish permission and Bypass 2FA enabled.');
+  process.exit(1);
+}
+
 function bumpVersion(version, bump) {
   const match = version.match(STABLE_SEMVER);
 
   if (!match) {
-    throw new Error(`Only stable SemVer versions are supported. Found: ${version}`);
+    console.error(`Only stable SemVer versions are supported. Found: ${version}`);
+    process.exit(1);
   }
 
   const major = Number.parseInt(match[1], 10);
@@ -71,173 +139,176 @@ function bumpVersion(version, bump) {
   return `${major}.${minor}.${patch + 1}`;
 }
 
-function pendingChangesetFiles() {
-  if (!fs.existsSync(CHANGESET_DIR)) {
-    return [];
+function syncInternalDependencies(manifest, internalPackageNames, version) {
+  for (const field of DEPENDENCY_FIELDS) {
+    const dependencies = manifest[field];
+
+    if (!dependencies || typeof dependencies !== 'object') {
+      continue;
+    }
+
+    for (const packageName of internalPackageNames) {
+      const current = dependencies[packageName];
+
+      if (typeof current !== 'string' || current.startsWith('workspace:')) {
+        continue;
+      }
+
+      dependencies[packageName] = version;
+    }
+  }
+}
+
+function syncVersions(rootManifest, packages, version) {
+  const internalPackageNames = new Set(packages.map((item) => item.manifest.name));
+
+  rootManifest.version = version;
+  writeJson(ROOT_MANIFEST, rootManifest);
+
+  for (const item of packages) {
+    item.manifest.version = version;
+    syncInternalDependencies(item.manifest, internalPackageNames, version);
+    writeJson(item.manifestPath, item.manifest);
+  }
+}
+
+function packageVersionExists(packageName, version) {
+  const result = spawnSync(
+    'npm',
+    ['view', `${packageName}@${version}`, 'version', '--registry', NPM_REGISTRY, '--json'],
+    {
+      encoding: 'utf8',
+      shell: process.platform === 'win32',
+      stdio: ['ignore', 'pipe', 'pipe'],
+    },
+  );
+
+  if (result.status === 0) {
+    return true;
+  }
+
+  const output = `${result.stdout ?? ''}\n${result.stderr ?? ''}`;
+
+  if (output.includes('E404') || output.includes('404')) {
+    return false;
+  }
+
+  console.error(`Could not check ${packageName}@${version} on npm registry.`);
+  console.error(output.trim());
+  process.exit(result.status ?? 1);
+}
+
+function assertVersionIsUnpublished(packages, version) {
+  const existingPackages = packages.filter((item) =>
+    packageVersionExists(item.manifest.name, version),
+  );
+
+  if (existingPackages.length === 0) {
+    return;
+  }
+
+  console.error(`Version ${version} already exists on npm for:`);
+
+  for (const item of existingPackages) {
+    console.error(`- ${item.manifest.name}`);
+  }
+
+  process.exit(1);
+}
+
+function releaseNotePath(version) {
+  return path.join(RELEASE_NOTE_DIR, `release-notes-${version}.md`);
+}
+
+function createReleaseNote(version) {
+  fs.ensureDirSync(RELEASE_NOTE_DIR);
+
+  const filePath = releaseNotePath(version);
+
+  if (!fs.existsSync(filePath)) {
+    fs.writeFileSync(
+      filePath,
+      `<!-- Fill in release notes for ${version}. Leave empty for no important changes. -->\n`,
+    );
+  }
+
+  return filePath;
+}
+
+function readReleaseNoteBody(filePath) {
+  if (!fs.existsSync(filePath)) {
+    return '';
   }
 
   return fs
-    .readdirSync(CHANGESET_DIR)
-    .filter((name) => name.endsWith('.md'))
-    .map((name) => path.join(CHANGESET_DIR, name))
-    .sort((left, right) => left.localeCompare(right));
-}
-
-function parseChangeset(filePath) {
-  const raw = fs.readFileSync(filePath, 'utf8');
-  const match = raw.match(/^---\r?\n[\s\S]*?\r?\n---\r?\n?([\s\S]*)$/);
-  const body = match ? match[1] : raw;
-  const meaningfulBody = body.replace(/<!--[\s\S]*?-->/g, '').trim();
-
-  return { filePath, raw, body, meaningfulBody };
-}
-
-function rewriteChangesets(files, packages, bump) {
-  const frontmatter = packages.map((item) => `"${item.manifest.name}": ${bump}`).join('\n');
-
-  for (const file of files) {
-    const parsed = parseChangeset(file);
-    const body = parsed.body.trim();
-    const nextContent = `---\n${frontmatter}\n---\n\n${body}\n`;
-
-    fs.writeFileSync(file, nextContent);
-  }
-}
-
-function runChangesetVersion() {
-  const command = 'changeset';
-  const result = spawnSync(command, ['version'], {
-    stdio: 'inherit',
-    shell: process.platform === 'win32',
-  });
-
-  if (result.error) {
-    console.error(result.error.message);
-    process.exit(1);
-  }
-
-  if (result.status !== 0) {
-    process.exit(result.status ?? 1);
-  }
-}
-
-function extractVersionEntry(changelogPath, version) {
-  if (!fs.existsSync(changelogPath)) {
-    throw new Error(`Expected package changelog was not generated: ${changelogPath}`);
-  }
-
-  const content = fs.readFileSync(changelogPath, 'utf8');
-  const lines = content.split(/\r?\n/);
-  const startIndex = lines.findIndex((line) => line.trim() === `## ${version}`);
-
-  if (startIndex === -1) {
-    throw new Error(`Could not find ${version} entry in ${changelogPath}.`);
-  }
-
-  let endIndex = lines.length;
-
-  for (let index = startIndex + 1; index < lines.length; index += 1) {
-    if (/^##\s+/.test(lines[index])) {
-      endIndex = index;
-      break;
-    }
-  }
-
-  return lines
-    .slice(startIndex + 1, endIndex)
-    .join('\n')
+    .readFileSync(filePath, 'utf8')
+    .replace(/<!--[\s\S]*?-->/g, '')
     .trim();
 }
 
-function writeRootChangelog(version, entry) {
-  if (!entry.trim()) {
-    console.error('Generated changelog entry is empty.');
-    process.exit(1);
-  }
-
-  const versionEntry = `## ${version}\n\n${entry.trim()}\n`;
-
-  if (!fs.existsSync(ROOT_CHANGELOG)) {
-    fs.writeFileSync(ROOT_CHANGELOG, `# Changelog\n\n${versionEntry}`);
+function updateChangelog(version, releaseNotes) {
+  if (!releaseNotes) {
     return;
   }
 
-  const current = fs.readFileSync(ROOT_CHANGELOG, 'utf8').trimEnd();
+  const entry = `## ${version}\n\n${releaseNotes}\n`;
 
-  if (current.startsWith('# Changelog')) {
-    const firstLineBreak = current.indexOf('\n');
-
-    if (firstLineBreak === -1) {
-      fs.writeFileSync(ROOT_CHANGELOG, `# Changelog\n\n${versionEntry}`);
-      return;
-    }
-
-    const header = current.slice(0, firstLineBreak).trimEnd();
-    const rest = current.slice(firstLineBreak).trim();
-    const next = rest ? `${header}\n\n${versionEntry}\n${rest}\n` : `${header}\n\n${versionEntry}`;
-
-    fs.writeFileSync(ROOT_CHANGELOG, next);
+  if (!fs.existsSync(CHANGELOG)) {
+    fs.writeFileSync(CHANGELOG, `# Changelog\n\n${entry}`);
     return;
   }
 
-  fs.writeFileSync(ROOT_CHANGELOG, `# Changelog\n\n${versionEntry}\n${current}\n`);
+  const current = fs.readFileSync(CHANGELOG, 'utf8').trimEnd();
+
+  if (!current.startsWith('# Changelog')) {
+    fs.writeFileSync(CHANGELOG, `# Changelog\n\n${entry}\n${current}\n`);
+    return;
+  }
+
+  const firstLineBreak = current.indexOf('\n');
+
+  if (firstLineBreak === -1) {
+    fs.writeFileSync(CHANGELOG, `# Changelog\n\n${entry}`);
+    return;
+  }
+
+  const header = current.slice(0, firstLineBreak).trimEnd();
+  const rest = current.slice(firstLineBreak).trim();
+  const next = rest ? `${header}\n\n${entry}\n${rest}\n` : `${header}\n\n${entry}`;
+
+  fs.writeFileSync(CHANGELOG, next);
 }
 
-function removePackageChangelogs(packages) {
+function publishPackages(packages) {
   for (const item of packages) {
-    fs.removeSync(path.join(item.dir, 'CHANGELOG.md'));
+    console.log(`Publishing ${item.manifest.name}@${item.manifest.version}...`);
+    run('pnpm', [
+      '--dir',
+      item.dir,
+      'publish',
+      '--access',
+      'public',
+      '--registry',
+      NPM_REGISTRY,
+      '--no-git-checks',
+    ]);
   }
 }
 
-function syncRootVersion(version) {
-  const rootManifestPath = path.resolve('package.json');
-  const rootManifest = readJson(rootManifestPath);
-  rootManifest.version = version;
-  writeJson(rootManifestPath, rootManifest);
-}
-
-const allowedArgs = new Set(['--no-publish']);
-const unknownArgs = process.argv.slice(2).filter((arg) => !allowedArgs.has(arg));
-
-if (unknownArgs.length > 0) {
-  console.error(`Unknown argument(s): ${unknownArgs.join(', ')}`);
-  console.error('This release script only supports interactive version selection.');
-  process.exit(1);
-}
-
-const rootManifest = readJson(path.resolve('package.json'));
-const packages = workspacePackages();
-const publishablePackages = packages.filter((item) => !item.manifest.private);
+const rootManifest = readJson(ROOT_MANIFEST);
+const allPackages = workspacePackages();
+const publishablePackages = allPackages.filter((item) => !item.manifest.private);
 
 if (publishablePackages.length === 0) {
-  console.error('No publishable workspace packages found.');
+  console.error('No publishable packages found under packages/.');
   process.exit(1);
 }
 
-assertVersionSync(rootManifest, packages);
-
-const changesetFiles = pendingChangesetFiles();
-
-if (changesetFiles.length === 0) {
-  console.error('No pending changesets found. Run `npm run changeset:add` first.');
-  process.exit(1);
-}
-
-const parsedChangesets = changesetFiles.map(parseChangeset);
-const emptyChangesets = parsedChangesets.filter((item) => item.meaningfulBody.length === 0);
-
-if (emptyChangesets.length > 0) {
-  console.error('Every changeset must contain a non-empty change summary.');
-
-  for (const item of emptyChangesets) {
-    console.error(`- ${path.relative(process.cwd(), item.filePath)}`);
-  }
-
-  process.exit(1);
-}
+assertPublishablePackageConfig(publishablePackages);
+assertNpmAuth();
 
 const bump = await select({
-  message: 'Select release version bump',
+  message: `Select release type from ${rootManifest.version}`,
   choices: [
     { name: 'patch', value: 'patch', description: 'Bug fixes and small changes' },
     { name: 'minor', value: 'minor', description: 'Backward-compatible features' },
@@ -245,24 +316,28 @@ const bump = await select({
   ],
 });
 const nextVersion = bumpVersion(rootManifest.version, bump);
-const representativePackage =
-  publishablePackages.find((item) => item.manifest.name === '@uni-pages-weave/core') ??
-  publishablePackages[0];
 
-rewriteChangesets(changesetFiles, publishablePackages, bump);
-runChangesetVersion();
+console.log(`Preparing release ${nextVersion}.`);
+syncVersions(rootManifest, publishablePackages, nextVersion);
 
-const generatedEntry = extractVersionEntry(
-  path.join(representativePackage.dir, 'CHANGELOG.md'),
-  nextVersion,
-);
+const notePath = createReleaseNote(nextVersion);
+console.log(`Release notes file: ${path.relative(process.cwd(), notePath)}`);
+await input({
+  message: 'Edit the release notes file, then press Enter to continue.',
+});
 
-syncRootVersion(nextVersion);
-writeRootChangelog(nextVersion, generatedEntry);
-removePackageChangelogs(packages);
+run('pnpm', ['run', 'verify']);
+assertVersionIsUnpublished(publishablePackages, nextVersion);
+publishPackages(publishablePackages);
 
-console.log(`Prepared release ${nextVersion}.`);
+const releaseNotes = readReleaseNoteBody(notePath);
+updateChangelog(nextVersion, releaseNotes);
+fs.removeSync(notePath);
 
-if (process.argv.includes('--no-publish')) {
-  console.log('Release files are ready. Publish was not run because --no-publish was provided.');
+if (releaseNotes) {
+  console.log(`Merged release notes into CHANGELOG.md for ${nextVersion}.`);
+} else {
+  console.log('Release notes were empty. CHANGELOG.md was not updated.');
 }
+
+console.log(`Release ${nextVersion} completed.`);

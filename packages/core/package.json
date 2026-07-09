@@ -1,6 +1,6 @@
 {
   "name": "@uni-pages-weave/core",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "Core UPW pages.json compiler APIs.",
   "type": "module",
   "license": "MIT",

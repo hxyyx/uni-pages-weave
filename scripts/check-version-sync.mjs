@@ -26,7 +26,9 @@ function workspacePackages() {
 
 const rootManifest = readJson(path.resolve('package.json'));
 const expectedVersion = rootManifest.version;
-const mismatches = workspacePackages().filter((item) => item.manifest.version !== expectedVersion);
+const mismatches = workspacePackages().filter(
+  (item) => !item.manifest.private && item.manifest.version !== expectedVersion,
+);
 
 if (mismatches.length > 0) {
   console.error(`Version mismatch. Root package version is ${expectedVersion}.`);
