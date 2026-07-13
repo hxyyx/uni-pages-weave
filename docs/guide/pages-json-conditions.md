@@ -1,13 +1,15 @@
 # pages.json 条件编译支持
 
-upw 支持把 `pages.json` 中的 uni-app 条件编译注释转换为 `$upw` 条件配置，并能在 `build` 时重新输出条件注释。
+upw 支持把 `pages.json` 中常用的 uni-app 条件编译注释转换为 `$upw` 条件配置，并能在 `build` 时重新输出条件注释。
+
+upw 会把条件编译收敛到结构化的页面条件和字段补丁模型中，因此只支持能稳定映射到 app/page 拆分模型的常用写法，不保证一比一覆盖 uni-app `pages.json` 中所有灵活的注释布局。
 
 ## 书写约束
 
 - 只有格式完整的整行 `// #ifdef ...`、`// #ifndef ...` 和 `// #endif` 会被识别为条件编译指令。
 - `#ifdef` / `#ifndef` 后的平台表达式支持单个平台 token，或多个平台 token 用 `||` 连接；平台 token 支持字母、数字、下划线和短横线。
 - `//` 后、指令后、`||` 两侧的空格可以省略或保留。
-- 块注释、属性行尾注释、缺少平台值、使用 `&&` 或单个 `|` 的注释不会进入 UPW 条件编译流程，会作为普通 JSONC 注释处理。
+- 块注释、属性行尾注释、缺少平台值、使用 `&&` 或单个 `|` 的注释不会进入 upw 条件编译流程，会作为普通 JSONC 注释处理。
 - 同一层条件数组内是或关系；嵌套条件层之间是同时满足关系。
 
 ## 支持的写法
@@ -400,9 +402,87 @@ pages.json：
 
 `children` 只支持一层，`children[].patch` 使用从页面或应用根节点开始的完整路径。
 
+### 数组项带条件
+
+pages.json：
+
+```json
+{
+  "globalStyle": {
+    "usingComponents": [
+      {
+        "name": "base-view"
+      },
+      // #ifdef MP-WEIXIN
+      {
+        "name": "wechat-view"
+      }
+      // #endif
+    ]
+  },
+  "pages": [
+    {
+      "path": "pages/index/index"
+    }
+  ]
+}
+```
+
+对应 `app.upw.json`：
+
+```json
+{
+  "$upw": {
+    "homePath": "pages/index/index",
+    "patches": [
+      {
+        "when": ["mp-weixin"],
+        "patch": {
+          "globalStyle": {
+            "usingComponents": [
+              {
+                "name": "base-view"
+              },
+              {
+                "name": "wechat-view"
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "globalStyle": {
+    "usingComponents": [
+      {
+        "name": "base-view"
+      }
+    ]
+  }
+}
+```
+
+数组项带条件时，upw 会把该条件下的完整数组值保存为对应字段的条件补丁。
+
 ## 不支持的写法
 
 以下写法是合法条件编译形式，但不能转换成当前 upw 配置。
+
+### 页面数组只有条件页面
+
+```json
+{
+  "pages": [
+    // #ifdef H5
+    {
+      "path": "pages/h5/index"
+    }
+    // #endif
+  ]
+}
+```
+
+生成 `pages.json` 时，每个页面数组需要至少保留一个无条件页面项。`app.upw.json` 中的 `$upw.homePath` 也应指向主包中的无条件页面。
 
 ### 条件包裹顶层属性
 

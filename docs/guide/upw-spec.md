@@ -14,13 +14,13 @@ upw 在 uni-app `pages.json` 基础上定义了一套扩展配置规范，用独
 - 分包页仍写成页面级 `.upw.json`，通过 `$upw.subPackageName` 关联到 `app.upw.json` 中的分包。
 - 页面文件名应与 `path` 最后一段一致，例如 `pages/index/index` 对应 `pages/index/index.upw.json`。
 - `app.upw.json` 中的分包字段使用 `subPackages`；分包页面列表由页面级 `.upw.json` 文件生成，不写在 `subPackages[].pages` 中。
-- UPW 不维护 uni-app app/page 字段白名单。除 UPW 明确消费或生成的字段外，其余字段按 uni-app 或平台扩展配置原样透传。
+- upw 不维护 uni-app app/page 字段白名单。除 upw 明确消费或生成的字段外，其余字段按 uni-app 或平台扩展配置原样透传。
 
 ## 数据模型
 
 ```ts
 interface AppUpw {
-  $upw?: AppMeta;
+  $upw: AppMeta;
   subPackages?: Subpackage[];
   [uniAppField: string]: unknown;
 }
@@ -66,7 +66,7 @@ interface ConditionalChildPatch extends ConditionMeta {
 }
 ```
 
-`[uniAppField]`、`[uniPageField]` 和 `[uniSubpackageField]` 表示 uni-app 原本支持的字段。`$upw` 是 upw 扩展配置，不会写入最终的 `pages.json`。
+`[uniAppField]`、`[uniPageField]` 和 `[uniSubpackageField]` 表示 uni-app 原本支持的字段。`$upw` 是 upw 扩展配置，不会写入最终的 `pages.json`。`app.upw.json` 必须声明 `$upw.homePath`，用于确定主包首页。
 
 ## 条件模型
 
@@ -110,7 +110,7 @@ interface ConditionalChildPatch extends ConditionMeta {
 | 字段            | 类型           | 必填 | 说明                                                                             |
 | --------------- | -------------- | ---- | -------------------------------------------------------------------------------- |
 | `$upw`          | `AppMeta`      | 是   | 应用级 upw 扩展配置，用于声明首页路径和应用级 `patches`。                        |
-| `subPackages`   | `Subpackage[]` | 否   | 分包声明。`pages` 由 UPW 根据页面级文件生成，不支持手写。                         |
+| `subPackages`   | `Subpackage[]` | 否   | 分包声明。`pages` 由 upw 根据页面级文件生成，不支持手写。                         |
 | `[uniAppField]` | `unknown`      | 否   | uni-app `pages.json` 支持的应用级字段，例如 `globalStyle`、`tabBar`、`easycom`。 |
 
 ### AppMeta
@@ -120,7 +120,7 @@ interface ConditionalChildPatch extends ConditionMeta {
 | `homePath` | `string`             | 是   | 应用首页路径，必须指向主包页面。           |
 | `patches` | `ConditionalPatch[]` | 否   | 应用级条件补丁，用于按平台调整应用级字段。 |
 
-应用级 patch 允许修改或新增普通 app 输出字段。UPW 只限制自身管理的字段：`$upw`、`pages`、`subPackages` 不支持出现在应用级 patch 中。顶层 `homePath` 如果出现，会被视为普通 app 字段透传，不作为首页配置。
+应用级 patch 允许修改或新增普通 app 输出字段。upw 只限制自身管理的字段：`$upw`、`pages`、`subPackages` 不支持出现在应用级 patch 中。顶层 `homePath` 如果出现，会被视为普通 app 字段透传，不作为首页配置。
 
 ```json
 {
@@ -212,6 +212,8 @@ interface ConditionalChildPatch extends ConditionMeta {
 ## 条件补丁
 
 字段差异写在 `$upw.patches` 中，`patch` 使用与当前配置文件相同的字段路径。
+
+应用级 patch 不能修改 `$upw`、`pages` 和 `subPackages`；页面级 patch 不能修改 `$upw` 和 `path`。这些字段由 upw 用于拆分、合并或生成页面列表。
 
 ### ConditionalPatch
 
