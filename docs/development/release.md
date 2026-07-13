@@ -6,8 +6,6 @@
 
 - `@uni-pages-weave/core`
 - `@uni-pages-weave/cli`
-- `@uni-pages-weave/vite`
-- `@uni-pages-weave/webpack`
 
 ## npm 认证
 
