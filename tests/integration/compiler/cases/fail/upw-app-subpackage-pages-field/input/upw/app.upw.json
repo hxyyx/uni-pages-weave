@@ -1,0 +1,16 @@
+{
+  "subPackages": [
+    {
+      "name": "account",
+      "root": "pages/account",
+      "pages": [
+        {
+          "path": "profile/profile"
+        }
+      ]
+    }
+  ],
+  "$upw": {
+    "homePath": "pages/index/index"
+  }
+}

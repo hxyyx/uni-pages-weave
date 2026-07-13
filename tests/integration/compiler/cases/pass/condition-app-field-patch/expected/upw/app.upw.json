@@ -1,14 +1,6 @@
 {
-  "homePath": "pages/component/view/view",
-  "globalStyle": {
-    "backgroundColorTop": "#F4F5F6",
-    "backgroundColorBottom": "#F4F5F6",
-    "h5": {
-      "maxWidth": 1190,
-      "navigationBarBackgroundColor": "#F1F1F1"
-    }
-  },
   "$upw": {
+    "homePath": "pages/component/view/view",
     "patches": [
       {
         "when": [
@@ -23,5 +15,14 @@
         }
       }
     ]
-  }
+  },
+  "globalStyle": {
+    "backgroundColorTop": "#F4F5F6",
+    "backgroundColorBottom": "#F4F5F6",
+    "h5": {
+      "maxWidth": 1190,
+      "navigationBarBackgroundColor": "#F1F1F1"
+    }
+  },
+  "subPackages": []
 }

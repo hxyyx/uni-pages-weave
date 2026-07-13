@@ -1,0 +1,12 @@
+{
+  "name": "cli-basic",
+  "kind": "cli-roundtrip",
+  "fixture": "fixture",
+  "pagesJsonPath": "src/pages.json",
+  "upwSourceDir": "src",
+  "commands": ["init", "build"],
+  "expectedFiles": [
+    "src/app.upw.json",
+    "src/pages/tabBar/component/component.upw.json"
+  ]
+}

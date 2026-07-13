@@ -1,0 +1,38 @@
+{
+  "name": "validateUpwAppConfig rejects patching UPW metadata and compile-time subPackages",
+  "kind": "validate-upw-app-errors",
+  "inputs": [
+    {
+      "config": {
+        "$upw": {
+          "homePath": "pages/index/index",
+          "patches": [
+            {
+              "when": ["h5"],
+              "patch": {
+                "$upw": {}
+              }
+            }
+          ]
+        }
+      },
+      "errorPattern": "\\$upw is UPW metadata and cannot be conditionally patched"
+    },
+    {
+      "config": {
+        "$upw": {
+          "homePath": "pages/index/index",
+          "patches": [
+            {
+              "when": ["h5"],
+              "patch": {
+                "subPackages": []
+              }
+            }
+          ]
+        }
+      },
+      "errorPattern": "cannot conditionally patch UPW compile-time fields: subPackages"
+    }
+  ]
+}

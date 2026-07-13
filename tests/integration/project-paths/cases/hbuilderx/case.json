@@ -1,0 +1,10 @@
+{
+  "name": "hbuilderx",
+  "kind": "project-paths",
+  "fixture": "fixture",
+  "expected": {
+    "layout": "root",
+    "pagesJsonPath": "pages.json",
+    "upwSourceDir": ""
+  }
+}

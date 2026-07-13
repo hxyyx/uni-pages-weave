@@ -4,10 +4,17 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 import { actualRoot, assertFileExists, cleanDir, repoRoot } from '../../support/files.mjs';
+import {
+  caseFixture,
+  readCases,
+  requireArray,
+  requireString,
+  requireStringValue,
+} from '../../support/cases.mjs';
 import { assertPagesJsonEquivalent } from '../../support/pages-json.mjs';
 
 const cliBin = path.join(repoRoot, 'packages', 'cli', 'dist', 'index.js');
-const fixturesRoot = path.join(repoRoot, 'tests', 'e2e', 'cli', 'fixtures');
+const casesRoot = path.join(repoRoot, 'tests', 'e2e', 'cli', 'cases');
 const e2eActualRoot = path.join(actualRoot, 'e2e', 'cli');
 
 function runCli(projectDir, ...args) {
@@ -17,26 +24,35 @@ function runCli(projectDir, ...args) {
   });
 }
 
-function assertCliRoundTrip({ fixtureName, projectName, pagesJsonPath, upwSourceDir }) {
-  const projectDir = path.join(e2eActualRoot, projectName);
+function assertCliRoundTrip(testCase, caseDir) {
+  const projectDir = path.join(e2eActualRoot, testCase.name);
+  const pagesJsonPath = requireString(testCase.pagesJsonPath, `${testCase.name}.pagesJsonPath`);
+  const commands = requireArray(testCase.commands, `${testCase.name}.commands`);
+  const expectedFiles = requireArray(testCase.expectedFiles, `${testCase.name}.expectedFiles`);
 
-  fs.cpSync(path.join(fixturesRoot, fixtureName), projectDir, { recursive: true });
-
-  runCli(projectDir, 'init');
+  fs.cpSync(caseFixture(caseDir, testCase.fixture, `${testCase.name}.fixture`), projectDir, {
+    recursive: true,
+  });
+  runCli(projectDir, requireString(commands[0], `${testCase.name}.commands[0]`));
 
   const pagesJson = path.join(projectDir, pagesJsonPath);
   const backup = path.join(path.dirname(pagesJson), 'pages.json.bak');
 
-  assertFileExists(backup, `${projectName} backup`);
-  assertFileExists(path.join(projectDir, upwSourceDir, 'app.upw.json'), `${projectName} app`);
-  assertFileExists(
-    path.join(projectDir, upwSourceDir, 'pages', 'index', 'index.upw.json'),
-    `${projectName} page`,
-  );
+  assertFileExists(backup, `${testCase.name} backup`);
 
-  runCli(projectDir, 'build');
+  for (const [index, expectedFile] of expectedFiles.entries()) {
+    assertFileExists(
+      path.join(
+        projectDir,
+        requireStringValue(expectedFile, `${testCase.name}.expectedFiles[${index}]`),
+      ),
+      `${testCase.name} expected file ${index}`,
+    );
+  }
 
-  assertPagesJsonEquivalent(projectName, backup, pagesJson);
+  runCli(projectDir, requireString(commands[1], `${testCase.name}.commands[1]`));
+
+  assertPagesJsonEquivalent(testCase.name, backup, pagesJson);
 }
 
 console.log('\nVerifying CLI E2E smoke tests');
@@ -44,18 +60,12 @@ console.log('\nVerifying CLI E2E smoke tests');
 assert.equal(fs.existsSync(cliBin), true, `CLI build output does not exist: ${cliBin}`);
 cleanDir(e2eActualRoot);
 
-assertCliRoundTrip({
-  fixtureName: 'hbuilderx-basic',
-  projectName: 'hbuilderx-basic',
-  pagesJsonPath: 'pages.json',
-  upwSourceDir: '',
-});
+for (const { caseDir, testCase } of readCases(casesRoot)) {
+  if (testCase.kind !== 'cli-roundtrip') {
+    throw new Error(`${testCase.name} has unsupported kind: ${testCase.kind}`);
+  }
 
-assertCliRoundTrip({
-  fixtureName: 'cli-basic',
-  projectName: 'cli-basic',
-  pagesJsonPath: path.join('src', 'pages.json'),
-  upwSourceDir: 'src',
-});
+  assertCliRoundTrip(testCase, caseDir);
+}
 
 console.log('CLI E2E smoke tests passed.');

@@ -1,0 +1,12 @@
+{
+  "pages": [
+    {
+          "path": "pages/index/index"
+        }
+  ]
+  // #ifdef H5
+  , "customAppConfig": {
+    "enabled": true
+  }
+  // #endif
+}

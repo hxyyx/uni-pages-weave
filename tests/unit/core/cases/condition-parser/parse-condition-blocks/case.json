@@ -1,0 +1,13 @@
+{
+  "name": "parseConditionBlocks parses conditional page objects",
+  "kind": "parse-condition-blocks",
+  "input": "input.jsonc",
+  "expected": {
+    "blocks": [
+      {
+        "path": "pages/h5/index",
+        "env": ["h5"]
+      }
+    ]
+  }
+}

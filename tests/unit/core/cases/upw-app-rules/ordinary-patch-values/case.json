@@ -1,0 +1,39 @@
+{
+  "name": "validateUpwAppConfig allows app patches for ordinary fields with arbitrary JSON values",
+  "kind": "validate-upw-app",
+  "input": {
+    "config": {
+      "$upw": {
+        "homePath": "pages/index/index",
+        "patches": [
+          {
+            "when": ["h5"],
+            "patch": {
+              "customAppConfig": {
+                "enabled": true
+              },
+              "stringValue": "value",
+              "numberValue": 1,
+              "booleanValue": false,
+              "nullValue": null,
+              "arrayValue": ["a", 1, true]
+            }
+          }
+        ]
+      },
+      "subPackages": []
+    }
+  },
+  "expected": {
+    "patch": {
+      "customAppConfig": {
+        "enabled": true
+      },
+      "stringValue": "value",
+      "numberValue": 1,
+      "booleanValue": false,
+      "nullValue": null,
+      "arrayValue": ["a", 1, true]
+    }
+  }
+}

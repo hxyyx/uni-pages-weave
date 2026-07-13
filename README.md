@@ -67,7 +67,7 @@ npm exec -- upw init
 
 - 备份原文件为 `pages.json.bak`。
 - 把应用配置、主包页面、分包页面拆成 upw 文件。
-- 把应用首页路径记录为 `app.upw.json` 的 `homePath`。
+- 把应用首页路径记录为 `app.upw.json` 的 `$upw.homePath`。
 
 初始化完成后的目录结构：
 

@@ -3,20 +3,23 @@ import type {
   ConditionBlock,
   ConditionNode,
   PageConditionPatch,
-} from '../ir/types.js';
+} from '../spec/upw-spec.js';
 import {
-  UNI_PAGES_KEY,
-  UNI_PAGE_PATH_KEY,
-  UNI_SUBPACKAGES_KEY,
-  UNI_SUB_PACKAGE_ROOT_KEY,
   UPW_ENDIF_DIRECTIVE_PATTERN,
   UPW_IFDEF_DIRECTIVE,
   UPW_IFNDEF_DIRECTIVE,
   UPW_IF_DIRECTIVE_PATTERN,
-} from '../internal/constants.js';
-import { parseJsonLike } from '../internal/json.js';
-import { isPlainObject } from '../internal/object.js';
-import { envToCondition, parseConditionEnv } from '../utils/platform.js';
+} from '../spec/upw-spec.js';
+import {
+  UNI_PAGES_KEY,
+  UNI_PAGE_PATH_KEY,
+  UNI_SUB_PACKAGES_COMPAT_KEY,
+  UNI_SUB_PACKAGES_KEY,
+  UNI_SUB_PACKAGE_ROOT_KEY,
+} from '../spec/uni-pages-spec.js';
+import { parseJsonLike } from '../foundation/json.js';
+import { isPlainObject } from '../foundation/object.js';
+import { envToCondition, parseConditionEnv } from '../condition/condition-platform.js';
 import {
   createScanner,
   findNodeAtLocation,
@@ -125,8 +128,18 @@ function isEndifDirective(text: string): boolean {
   return UPW_ENDIF_DIRECTIVE_PATTERN.test(text);
 }
 
+function validDirectiveLine(
+  token: SyntaxKind,
+  source: string,
+  offset: number,
+  length: number,
+): boolean {
+  return token === SyntaxKind.LineCommentTrivia && isStandaloneCommentLine(source, offset, length);
+}
+
 export function normalizePagesJsonComments(source: string): string {
   const scanner = createScanner(source, false);
+  const directives = conditionDirectives(source);
   const output = source.split('');
 
   for (let token = scanner.scan(); token !== SyntaxKind.EOF; token = scanner.scan()) {
@@ -136,18 +149,9 @@ export function normalizePagesJsonComments(source: string): string {
 
     const offset = scanner.getTokenOffset();
     const length = scanner.getTokenLength();
-    const text = commentText(source, offset, length);
-    const isConditionDirective = Boolean(directiveMatch(text) || isEndifDirective(text));
+    const line = lineNumberAt(source, offset);
 
-    if (isConditionDirective) {
-      if (token !== SyntaxKind.LineCommentTrivia) {
-        throw new Error('Conditional compilation directives must use // line comments.');
-      }
-
-      if (!isStandaloneCommentLine(source, offset, length)) {
-        throw new Error('Conditional compilation directives must occupy a full line.');
-      }
-
+    if (directives.has(line)) {
       continue;
     }
 
@@ -186,15 +190,13 @@ function conditionDirectives(source: string): Map<number, ConditionDirective> {
     const offset = scanner.getTokenOffset();
     const length = scanner.getTokenLength();
     const text = commentText(source, offset, length);
+    const isValidDirectiveLine = validDirectiveLine(token, source, offset, length);
+
+    if (!isValidDirectiveLine) {
+      continue;
+    }
+
     const start = directiveMatch(text);
-
-    if ((start || isEndifDirective(text)) && token !== SyntaxKind.LineCommentTrivia) {
-      throw new Error('Conditional compilation directives must use // line comments.');
-    }
-
-    if ((start || isEndifDirective(text)) && !isStandaloneCommentLine(source, offset, length)) {
-      throw new Error('Conditional compilation directives must occupy a full line.');
-    }
 
     if (start) {
       const directive: ConditionDirective = {
@@ -215,7 +217,7 @@ function conditionDirectives(source: string): Map<number, ConditionDirective> {
       const line = lineNumberAt(source, offset);
 
       if (!startDirective) {
-        throw new Error('Conditional compilation #endif has no matching #ifdef/#ifndef.');
+        continue;
       }
 
       startDirective.endLine = line;
@@ -320,7 +322,7 @@ function pageBlock(
   code: string,
   directives: Map<number, ConditionDirective>,
   node: Node,
-  subpackageRoot?: string,
+  subPackageRoot?: string,
 ): ConditionBlock | undefined {
   const conditions = conditionsBeforeLine(directives, lineNumberAt(code, node.offset));
 
@@ -342,7 +344,7 @@ function pageBlock(
   return {
     conditions,
     content,
-    subpackageRoot,
+    subPackageRoot,
   };
 }
 
@@ -350,14 +352,14 @@ function pageBlocksFromArray(
   code: string,
   directives: Map<number, ConditionDirective>,
   pagesNode: Node | undefined,
-  subpackageRoot?: string,
+  subPackageRoot?: string,
 ): ConditionBlock[] {
   if (!pagesNode || pagesNode.type !== 'array') {
     return [];
   }
 
   return (pagesNode.children ?? [])
-    .map((child) => pageBlock(code, directives, child, subpackageRoot))
+    .map((child) => pageBlock(code, directives, child, subPackageRoot))
     .filter((block): block is ConditionBlock => Boolean(block));
 }
 
@@ -371,11 +373,11 @@ function pageNodesFromArray(pagesNode: Node | undefined): Node[] {
 
 function pageNodes(root: Node): Node[] {
   const topLevelPages = pageNodesFromArray(findNodeAtLocation(root, [UNI_PAGES_KEY]));
-  const subpackagePages = subpackageNodes(root).flatMap((subpackage) =>
-    pageNodesFromArray(propertyValueNode(subpackage, UNI_PAGES_KEY)),
+  const subPackagePages = subPackageNodes(root).flatMap((subPackage) =>
+    pageNodesFromArray(propertyValueNode(subPackage, UNI_PAGES_KEY)),
   );
 
-  return [...topLevelPages, ...subpackagePages];
+  return [...topLevelPages, ...subPackagePages];
 }
 
 function offsetInRanges(offset: number, ranges: Array<readonly [number, number]>): boolean {
@@ -695,39 +697,41 @@ function parseValidatedPagesRoot(
 
   if (root) {
     validateConditionalCompilationUnits(code, directives, root);
-    validateNoConditionalSubpackageObjects(code, directives, root);
+    validateNoConditionalSubPackageObjects(code, directives, root);
   }
 
   return root;
 }
 
-function subpackageNodes(root: Node): Node[] {
-  const subpackages = findNodeAtLocation(root, [UNI_SUBPACKAGES_KEY]);
+function subPackageNodes(root: Node): Node[] {
+  const subPackages =
+    findNodeAtLocation(root, [UNI_SUB_PACKAGES_KEY]) ??
+    findNodeAtLocation(root, [UNI_SUB_PACKAGES_COMPAT_KEY]);
 
-  if (subpackages?.type !== 'array') {
+  if (subPackages?.type !== 'array') {
     return [];
   }
 
-  return subpackages.children ?? [];
+  return subPackages.children ?? [];
 }
 
-function validateNoConditionalSubpackageObjects(
+function validateNoConditionalSubPackageObjects(
   code: string,
   directives: Map<number, ConditionDirective>,
   root: Node,
 ): void {
-  for (const subpackage of subpackageNodes(root)) {
-    if (conditionsBeforeLine(directives, lineNumberAt(code, subpackage.offset)).length > 0) {
-      throw new Error('Conditional compilation cannot wrap a subpackage object.');
+  for (const subPackage of subPackageNodes(root)) {
+    if (conditionsBeforeLine(directives, lineNumberAt(code, subPackage.offset)).length > 0) {
+      throw new Error('Conditional compilation cannot wrap a subPackage object.');
     }
   }
 }
 
-function subpackagePageNodes(root: Node): Array<{ node: Node; root?: string }> {
-  return subpackageNodes(root).flatMap((subpackage) =>
-    pageNodesFromArray(propertyValueNode(subpackage, UNI_PAGES_KEY)).map((node) => ({
+function subPackagePageNodes(root: Node): Array<{ node: Node; root?: string }> {
+  return subPackageNodes(root).flatMap((subPackage) =>
+    pageNodesFromArray(propertyValueNode(subPackage, UNI_PAGES_KEY)).map((node) => ({
       node,
-      root: nodeStringValue(propertyValueNode(subpackage, UNI_SUB_PACKAGE_ROOT_KEY)),
+      root: nodeStringValue(propertyValueNode(subPackage, UNI_SUB_PACKAGE_ROOT_KEY)),
     })),
   );
 }
@@ -743,9 +747,9 @@ export function parseConditionPatches(code: string): PageConditionPatch[] {
   const topLevelPages: Array<{ node: Node; root?: string }> = pageNodesFromArray(
     findNodeAtLocation(root, [UNI_PAGES_KEY]),
   ).map((node) => ({ node }));
-  const pages = [...topLevelPages, ...subpackagePageNodes(root)];
+  const pages = [...topLevelPages, ...subPackagePageNodes(root)];
 
-  return pages.flatMap(({ node, root: subpackageRoot }) => {
+  return pages.flatMap(({ node, root: subPackageRoot }) => {
     const pagePath = nodeStringValue(propertyValueNode(node, UNI_PAGE_PATH_KEY));
 
     if (!pagePath) {
@@ -761,7 +765,7 @@ export function parseConditionPatches(code: string): PageConditionPatch[] {
       baseConditionCount,
     }).map((patch) => ({
       pagePath,
-      subpackageRoot,
+      subPackageRoot,
       conditions: patch.conditions,
       patch: patch.patch,
     }));
@@ -799,14 +803,16 @@ export function parseConditionBlocks(code: string): ConditionBlock[] {
     directives,
     findNodeAtLocation(root, [UNI_PAGES_KEY]),
   );
-  const subpackagePages = subpackageNodes(root).flatMap((subpackage) =>
+  const subPackagePages = subPackageNodes(root).flatMap((subPackage) =>
     pageBlocksFromArray(
       code,
       directives,
-      propertyValueNode(subpackage, UNI_PAGES_KEY),
-      nodeStringValue(propertyValueNode(subpackage, UNI_SUB_PACKAGE_ROOT_KEY)),
+      propertyValueNode(subPackage, UNI_PAGES_KEY),
+      nodeStringValue(propertyValueNode(subPackage, UNI_SUB_PACKAGE_ROOT_KEY)),
     ),
   );
 
-  return [...topLevelPages, ...subpackagePages];
+  return [...topLevelPages, ...subPackagePages];
 }
+
+

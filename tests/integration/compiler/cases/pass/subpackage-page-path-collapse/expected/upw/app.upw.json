@@ -1,6 +1,8 @@
 {
-  "homePath": "pages/index/index",
-  "subpackages": [
+  "$upw": {
+    "homePath": "pages/index/index"
+  },
+  "subPackages": [
     {
       "root": "pages/account",
       "name": "pages/account"

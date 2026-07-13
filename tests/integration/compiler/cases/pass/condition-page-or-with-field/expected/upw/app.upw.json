@@ -1,3 +1,6 @@
 {
-  "homePath": "pages/component/textarea/textarea"
+  "$upw": {
+    "homePath": "pages/component/textarea/textarea"
+  },
+  "subPackages": []
 }

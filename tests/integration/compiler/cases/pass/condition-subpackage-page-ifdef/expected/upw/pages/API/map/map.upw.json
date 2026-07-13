@@ -1,6 +1,6 @@
 {
   "$upw": {
-    "subpackageName": "pages/API"
+    "subPackageName": "pages/API"
   },
   "path": "pages/API/map/map",
   "style": {

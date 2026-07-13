@@ -1,0 +1,14 @@
+{
+  "name": "isPlatformPagePath detects platform workspace pages",
+  "kind": "is-platform-page-path",
+  "inputs": [
+    {
+      "path": "platforms/mp-weixin/pages/index/index",
+      "expected": true
+    },
+    {
+      "path": "pages/platforms/mp-weixin/index",
+      "expected": false
+    }
+  ]
+}

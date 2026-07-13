@@ -1,0 +1,10 @@
+{
+  "name": "normalizePagePath removes relative and trailing separators",
+  "kind": "normalize-page-path",
+  "input": {
+    "path": "./pages\\index\\index/"
+  },
+  "expected": {
+    "path": "pages/index/index"
+  }
+}

@@ -1,5 +1,5 @@
 {
-  "name": "upw-lowercase-subpackages-to-uni",
+  "name": "upw-subPackages-to-uni",
   "kind": "upw-to-uni",
   "input": "input/upw",
   "actual": {

@@ -16,62 +16,19 @@ import {
   repoRoot,
   resolveFixture,
 } from '../../support/files.mjs';
+import {
+  actualCaseDir,
+  caseFixture,
+  copyFixtureToActual,
+  readCases,
+  requireString,
+  withWorkingDirectory,
+} from '../../support/cases.mjs';
 import { readJsonc } from '../../support/jsonc.mjs';
 import { assertPagesJsonEquivalent } from '../../support/pages-json.mjs';
 
 const casesRoot = path.join(repoRoot, 'tests', 'integration', 'compiler', 'cases');
 const caseActualRoot = path.join(actualRoot, 'integration', 'compiler');
-
-function findCaseFiles(dir) {
-  if (!fs.existsSync(dir)) {
-    return [];
-  }
-
-  return fs.readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
-    const fullPath = path.join(dir, entry.name);
-
-    if (entry.isDirectory()) {
-      return findCaseFiles(fullPath);
-    }
-
-    return entry.isFile() && entry.name === 'case.json' ? [fullPath] : [];
-  });
-}
-
-function requireString(value, label) {
-  if (typeof value !== 'string' || value.trim() === '') {
-    throw new Error(`${label} must be a non-empty string.`);
-  }
-
-  return value;
-}
-
-function actualCaseDir(testCase, caseFile) {
-  const group = path.relative(casesRoot, path.dirname(caseFile)).split(path.sep)[0] ?? 'case';
-
-  return path.join(caseActualRoot, group, testCase.name);
-}
-
-function withWorkingDirectory(dir, callback) {
-  const previous = process.cwd();
-
-  process.chdir(dir);
-
-  try {
-    return callback();
-  } finally {
-    process.chdir(previous);
-  }
-}
-
-function copyInputToActual(input, actualDir) {
-  const copiedInput = path.join(actualDir, 'input', path.basename(input));
-
-  fs.mkdirSync(path.dirname(copiedInput), { recursive: true });
-  fs.copyFileSync(input, copiedInput);
-
-  return copiedInput;
-}
 
 function assertPagesJsonBackup(input) {
   const backup = path.join(path.dirname(input), 'pages.json.bak');
@@ -88,10 +45,7 @@ function assertNoPagesJsonBackup(input) {
 
 function readExpectedErrorPattern(testCase, caseDir) {
   const expectedError = readJsonc(
-    resolveFixture(
-      caseDir,
-      requireString(testCase.expectedError, `${testCase.name}.expectedError`),
-    ),
+    caseFixture(caseDir, testCase.expectedError, `${testCase.name}.expectedError`),
   );
 
   if (typeof expectedError.messagePattern !== 'string') {
@@ -126,8 +80,8 @@ function compareSuccessOutputs(testCase, caseDir, actualDir) {
 
 function runSuccessCase(testCase, caseDir, actualDir) {
   const actual = testCase.actual ?? {};
-  const input = copyInputToActual(
-    resolveFixture(caseDir, requireString(testCase.input, `${testCase.name}.input`)),
+  const input = copyFixtureToActual(
+    caseFixture(caseDir, testCase.input, `${testCase.name}.input`),
     actualDir,
   );
   const upwDir = path.join(actualDir, requireString(actual.upw, `${testCase.name}.actual.upw`));
@@ -158,7 +112,7 @@ function runSuccessCase(testCase, caseDir, actualDir) {
 
 function runUpwToUniSuccessCase(testCase, caseDir, actualDir) {
   const actual = testCase.actual ?? {};
-  const input = resolveFixture(caseDir, requireString(testCase.input, `${testCase.name}.input`));
+  const input = caseFixture(caseDir, testCase.input, `${testCase.name}.input`);
 
   buildUniPagesJsonFromUpwSource({
     input,
@@ -169,8 +123,8 @@ function runUpwToUniSuccessCase(testCase, caseDir, actualDir) {
 }
 
 function runUniToUpwErrorCase(testCase, caseDir, actualDir) {
-  const input = copyInputToActual(
-    resolveFixture(caseDir, requireString(testCase.input, `${testCase.name}.input`)),
+  const input = copyFixtureToActual(
+    caseFixture(caseDir, testCase.input, `${testCase.name}.input`),
     actualDir,
   );
   const messagePattern = readExpectedErrorPattern(testCase, caseDir);
@@ -196,7 +150,7 @@ function runUniToUpwErrorCase(testCase, caseDir, actualDir) {
 }
 
 function runUpwToUniErrorCase(testCase, caseDir, actualDir) {
-  const input = resolveFixture(caseDir, requireString(testCase.input, `${testCase.name}.input`));
+  const input = caseFixture(caseDir, testCase.input, `${testCase.name}.input`);
   const messagePattern = readExpectedErrorPattern(testCase, caseDir);
 
   try {
@@ -214,22 +168,12 @@ function runUpwToUniErrorCase(testCase, caseDir, actualDir) {
   throw new Error(`${testCase.name} expected an error, but conversion succeeded.`);
 }
 
-const caseFiles = findCaseFiles(casesRoot).sort();
-
-if (caseFiles.length === 0) {
-  throw new Error('No compiler integration cases found under tests/integration/compiler/cases.');
-}
+const cases = readCases(casesRoot);
 
 cleanDir(caseActualRoot);
 
-for (const caseFile of caseFiles) {
-  const caseDir = path.dirname(caseFile);
-  const testCase = readJsonc(caseFile);
-
-  requireString(testCase.name, `${caseFile}.name`);
-  requireString(testCase.kind, `${testCase.name}.kind`);
-
-  const actualDir = actualCaseDir(testCase, caseFile);
+for (const { caseDir, caseFile, testCase } of cases) {
+  const actualDir = actualCaseDir(casesRoot, caseActualRoot, testCase, caseFile);
 
   console.log(`\nVerifying scenario fixture: ${testCase.name}`);
   cleanDir(actualDir);

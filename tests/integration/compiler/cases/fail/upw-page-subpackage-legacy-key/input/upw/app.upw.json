@@ -1,7 +1,0 @@
-{
-  "homePath": "pages/index/index",
-  "subpackages": [
-    { "name": "canonical", "root": "pages/canonical" },
-    { "name": "legacy", "root": "pages/legacy" }
-  ]
-}

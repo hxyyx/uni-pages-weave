@@ -1,4 +1,4 @@
-import pc from 'picocolors';
+﻿import pc from 'picocolors';
 
 export type UpwLogLevel = 'info' | 'warn' | 'error';
 
@@ -46,3 +46,5 @@ export const logger = {
     console.error(formatLog('error', message));
   },
 };
+
+

@@ -1,0 +1,3 @@
+{
+  "messagePattern": "cannot conditionally patch UPW compile-time fields: subPackages"
+}

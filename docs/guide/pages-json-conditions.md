@@ -4,9 +4,10 @@ upw 支持把 `pages.json` 中的 uni-app 条件编译注释转换为 `$upw` 条
 
 ## 书写约束
 
-- 条件指令只支持 `// #ifdef ...`、`// #ifndef ...` 和 `// #endif`。
-- 条件指令必须单独占一整行，不能写成块注释，也不能写在属性行尾。
-- 条件表达式只支持 `||`，不支持 `&&` 或单个 `|`。
+- 只有格式完整的整行 `// #ifdef ...`、`// #ifndef ...` 和 `// #endif` 会被识别为条件编译指令。
+- `#ifdef` / `#ifndef` 后的平台表达式支持单个平台 token，或多个平台 token 用 `||` 连接；平台 token 支持字母、数字、下划线和短横线。
+- `//` 后、指令后、`||` 两侧的空格可以省略或保留。
+- 块注释、属性行尾注释、缺少平台值、使用 `&&` 或单个 `|` 的注释不会进入 UPW 条件编译流程，会作为普通 JSONC 注释处理。
 - 同一层条件数组内是或关系；嵌套条件层之间是同时满足关系。
 
 ## 支持的写法
@@ -172,7 +173,7 @@ pages.json：
 ```json
 {
   "$upw": {
-    "subpackageName": "pages/API",
+    "subPackageName": "pages/API",
     "when": ["app-plus"]
   },
   "path": "pages/API/map-search/map-search",
@@ -182,7 +183,7 @@ pages.json：
 }
 ```
 
-分包没有声明 `name` 时，upw 会用分包 `root` 作为 `subpackageName`。
+分包没有声明 `name` 时，upw 会用分包 `root` 作为 `subPackageName`。
 
 ### 应用字段带条件
 
@@ -213,14 +214,8 @@ pages.json：
 
 ```json
 {
-  "homePath": "pages/index/index",
-  "globalStyle": {
-    "backgroundColorTop": "#F4F5F6",
-    "h5": {
-      "maxWidth": 1190
-    }
-  },
   "$upw": {
+    "homePath": "pages/index/index",
     "patches": [
       {
         "when": ["mp-360"],
@@ -233,6 +228,12 @@ pages.json：
         }
       }
     ]
+  },
+  "globalStyle": {
+    "backgroundColorTop": "#F4F5F6",
+    "h5": {
+      "maxWidth": 1190
+    }
   }
 }
 ```

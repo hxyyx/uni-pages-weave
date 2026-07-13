@@ -1,0 +1,9 @@
+{
+  "pages": [
+    //#ifdefMP-WEIXIN||H5
+    {
+      "path": "pages/compact/index"
+    }
+    //#endif
+  ]
+}
