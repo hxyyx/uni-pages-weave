@@ -122,6 +122,12 @@ interface ConditionalChildPatch extends ConditionMeta {
 
 应用级 patch 允许修改或新增普通 app 输出字段。upw 只限制自身管理的字段：`$upw`、`pages`、`subPackages` 不支持出现在应用级 patch 中。顶层 `homePath` 如果出现，会被视为普通 app 字段透传，不作为首页配置。
 
+这些字段被限制的原因分别是：
+
+- `$upw` 是 upw 元数据，不能作为条件 patch 的目标。
+- `pages` 由页面级 `.upw.json` 文件生成，不能在应用级配置中手写或 patch。
+- `subPackages` 是 upw 编译期结构字段；分包声明写在 `app.upw.json` 中，分包页面列表由页面级 `.upw.json` 文件生成。
+
 ```json
 {
   "$upw": {
@@ -213,7 +219,7 @@ interface ConditionalChildPatch extends ConditionMeta {
 
 字段差异写在 `$upw.patches` 中，`patch` 使用与当前配置文件相同的字段路径。
 
-应用级 patch 不能修改 `$upw`、`pages` 和 `subPackages`；页面级 patch 不能修改 `$upw` 和 `path`。这些字段由 upw 用于拆分、合并或生成页面列表。
+应用级 patch 不能修改 `$upw`、`pages` 和 `subPackages`；页面级 patch 不能修改 `$upw` 和 `path`。这些字段由 upw 用于拆分、合并、定位页面或生成页面列表。
 
 ### ConditionalPatch
 

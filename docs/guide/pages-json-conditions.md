@@ -2,9 +2,9 @@
 
 upw 支持把 `pages.json` 中常用的 uni-app 条件编译注释转换为 `$upw` 条件配置，并能在 `build` 时重新输出条件注释。
 
-upw 会把条件编译收敛到结构化的页面条件和字段补丁模型中，因此只支持能稳定映射到 app/page 拆分模型的常用写法，不保证一比一覆盖 uni-app `pages.json` 中所有灵活的注释布局。
-
 ## 书写约束
+
+upw 会把条件编译收敛到结构化的页面条件和字段补丁模型中，只识别能稳定转换为 `.upw.json` 结构的条件注释。`upw init` 不是 uni-app `pages.json` 的条件编译 lint；原始 `pages.json` 是否能在 uni-app 中正常工作，仍由 uni-app 编译环境决定。
 
 - 只有格式完整的整行 `// #ifdef ...`、`// #ifndef ...` 和 `// #endif` 会被识别为条件编译指令。
 - `#ifdef` / `#ifndef` 后的平台表达式支持单个平台 token，或多个平台 token 用 `||` 连接；平台 token 支持字母、数字、下划线和短横线。
@@ -236,6 +236,43 @@ pages.json：
     "h5": {
       "maxWidth": 1190
     }
+  }
+}
+```
+
+普通 App 顶层字段也可以整体带条件，upw 会把该字段转换为 `app.upw.json` 中的应用级 `$upw.patches`：
+
+```json
+{
+  // #ifdef H5
+  "globalStyle": {
+    "navigationBarTitleText": "H5"
+  },
+  // #endif
+  "pages": [
+    {
+      "path": "pages/index/index"
+    }
+  ]
+}
+```
+
+对应 `app.upw.json`：
+
+```json
+{
+  "$upw": {
+    "homePath": "pages/index/index",
+    "patches": [
+      {
+        "when": ["h5"],
+        "patch": {
+          "globalStyle": {
+            "navigationBarTitleText": "H5"
+          }
+        }
+      }
+    ]
   }
 }
 ```
@@ -484,24 +521,35 @@ pages.json：
 
 生成 `pages.json` 时，每个页面数组需要至少保留一个无条件页面项。`app.upw.json` 中的 `$upw.homePath` 也应指向主包中的无条件页面。
 
-### 条件包裹顶层属性
+### 条件包裹 upw 管理的顶层字段
 
 ```json
 {
   // #ifdef H5
-  "globalStyle": {
-    "backgroundColorTop": "#F4F5F6"
-  },
-  // #endif
   "pages": [
     {
-      "path": "pages/component/view/view"
+      "path": "pages/h5/index"
+    }
+  ],
+  // #endif
+  "subPackages": [
+    {
+      "root": "pages/account",
+      "pages": [
+        {
+          "path": "profile/profile"
+        }
+      ]
     }
   ]
 }
 ```
 
-顶层属性本身不能带条件；可以把条件写到属性内部的完整成员上。
+普通 App 顶层字段可以带条件，并会转换为应用级 `$upw.patches`。但 `$upw`、`pages`、`subPackages` 是 upw 管理字段，不能作为 App 条件 patch 的目标：
+
+- `$upw` 是 upw 元数据。
+- `pages` 由页面级 `.upw.json` 文件生成。
+- `subPackages` 是 upw 编译期结构字段，分包页面列表由页面级 `.upw.json` 文件生成。
 
 ### 条件包裹分包对象
 

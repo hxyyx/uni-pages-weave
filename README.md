@@ -4,6 +4,10 @@
 
 uni-pages-weave 是 uni-app `pages.json` 的多文件配置组织方案。
 
+## 命名约定
+
+`uni-pages-weave` 用于正式项目名、npm 包名和文档标题；`upw` 用于 CLI 命令、日志、错误信息，以及文档中对工具能力的日常称呼。
+
 ## 快速开始
 
 安装 CLI：
