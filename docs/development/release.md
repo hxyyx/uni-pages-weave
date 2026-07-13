@@ -48,7 +48,7 @@ npm run release
 7. 快照根包和发布包的 `package.json`，进入可回滚发布准备阶段。
 8. 将下一版本写入根包和所有发布包。
 9. 同步发布包之间的非 `workspace:` 内部依赖版本；`workspace:*` 等 workspace 协议保持不变。
-10. 创建 `.upw/release-notes-<version>.md`。
+10. 创建根目录下的 `release-notes-<version>.md`。
 11. 提示手动编辑该临时日志文件，回到终端按回车继续。
 12. 重新构建发布产物，确保 `dist` 使用新版本号。
 13. 运行版本同步检查。
@@ -57,7 +57,7 @@ npm run release
 16. 逐个执行 `pnpm publish`。
 17. 发布成功后读取临时日志，去掉 HTML 注释和空白。
 18. 如果日志非空，将内容写入根目录 `CHANGELOG.md` 顶部。
-19. 删除 `.upw/release-notes-<version>.md`。
+19. 删除根目录下的 `release-notes-<version>.md`。
 
 ## 发布日志
 

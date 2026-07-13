@@ -7,7 +7,6 @@ const NPM_REGISTRY = 'https://registry.npmjs.org/';
 const PACKAGE_SCOPE = '@uni-pages-weave/';
 const ROOT_MANIFEST = path.resolve('package.json');
 const CHANGELOG = path.resolve('CHANGELOG.md');
-const RELEASE_NOTE_DIR = path.resolve('.upw');
 const STABLE_SEMVER = /^(\d+)\.(\d+)\.(\d+)$/;
 const DEPENDENCY_FIELDS = [
   'dependencies',
@@ -327,12 +326,10 @@ function packDryRun(packages) {
 }
 
 function releaseNotePath(version) {
-  return path.join(RELEASE_NOTE_DIR, `release-notes-${version}.md`);
+  return path.resolve(`release-notes-${version}.md`);
 }
 
 function createReleaseNote(version) {
-  fs.ensureDirSync(RELEASE_NOTE_DIR);
-
   const filePath = releaseNotePath(version);
 
   if (!fs.existsSync(filePath)) {
