@@ -4,30 +4,42 @@
 
 uni-pages-weave 是 uni-app `pages.json` 的多文件配置组织方案。
 
+## 命名约定
+
+`uni-pages-weave` 用于正式项目名、npm 包名和文档标题；`upw` 用于 CLI 命令、日志、错误信息，以及文档中对工具能力的日常称呼。
+
 ## 快速开始
 
 安装 CLI：
 
 ```sh
 npm install -D @uni-pages-weave/cli
+# yarn add -D @uni-pages-weave/cli
+# pnpm add -D @uni-pages-weave/cli
 ```
 
 从现有 `pages.json` 初始化 upw 配置：
 
 ```sh
-npx upw init
+npm exec -- upw init
+# yarn upw init
+# pnpm exec upw init
 ```
 
 生成 `pages.json`：
 
 ```sh
-npx upw build
+npm exec -- upw build
+# yarn upw build
+# pnpm exec upw build
 ```
 
 开发时监听 upw 文件并自动生成 `pages.json`：
 
 ```sh
-npx upw build --watch
+npm exec -- upw build --watch
+# yarn upw build --watch
+# pnpm exec upw build --watch
 ```
 
 ## CLI
@@ -50,14 +62,16 @@ npx upw build --watch
 从现有 `pages.json` 生成 upw 配置：
 
 ```sh
-npx upw init
+npm exec -- upw init
+# yarn upw init
+# pnpm exec upw init
 ```
 
 `init` 会：
 
 - 备份原文件为 `pages.json.bak`。
 - 把应用配置、主包页面、分包页面拆成 upw 文件。
-- 把应用首页路径记录为 `app.upw.json` 的 `homePath`。
+- 把应用首页路径记录为 `app.upw.json` 的 `$upw.homePath`。
 
 初始化完成后的目录结构：
 
@@ -81,7 +95,9 @@ npx upw init
 如果 upw 文件已存在，默认不会覆盖。需要重新生成时使用：
 
 ```sh
-npx upw init --force
+npm exec -- upw init --force
+# yarn upw init --force
+# pnpm exec upw init --force
 ```
 
 参数：
@@ -95,13 +111,17 @@ npx upw init --force
 从 upw 配置生成 `pages.json`：
 
 ```sh
-npx upw build
+npm exec -- upw build
+# yarn upw build
+# pnpm exec upw build
 ```
 
 监听 upw 文件并在变化后生成 `pages.json`：
 
 ```sh
-npx upw build --watch
+npm exec -- upw build --watch
+# yarn upw build --watch
+# pnpm exec upw build --watch
 ```
 
 参数：
@@ -113,8 +133,12 @@ npx upw build --watch
 ### 通用参数
 
 ```sh
-npx upw --help
-npx upw --version
+npm exec -- upw --help
+npm exec -- upw --version
+# yarn upw --help
+# yarn upw --version
+# pnpm exec upw --help
+# pnpm exec upw --version
 ```
 
 | 参数            | 说明                |

@@ -1,0 +1,15 @@
+{
+  "name": "validateUpwAppConfig reads compile-time homePath from $upw.homePath",
+  "kind": "validate-upw-app",
+  "input": {
+    "config": {
+      "$upw": {
+        "homePath": " pages/index/index "
+      },
+      "subPackages": []
+    }
+  },
+  "expected": {
+    "homePath": "pages/index/index"
+  }
+}

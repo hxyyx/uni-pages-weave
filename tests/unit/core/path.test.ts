@@ -6,26 +6,58 @@ import {
   isPlatformPagePath,
   normalizePagePath,
   pagePathToWorkspaceFile,
-} from '../../../packages/core/src/utils/path.js';
+} from '../../../packages/core/src/workspace/upw-workspace-paths.js';
+import { readCases, requireArray, requireObject, requireString } from '../../support/cases.mjs';
+import { repoRoot } from '../../support/files.mjs';
 
-test('normalizePagePath removes relative and trailing separators', () => {
-  assert.equal(normalizePagePath('./pages\\index\\index/'), 'pages/index/index');
-});
+const casesRoot = path.join(repoRoot, 'tests', 'unit', 'core', 'cases', 'path');
 
-test('isPlatformPagePath detects platform workspace pages', () => {
-  assert.equal(isPlatformPagePath('platforms/mp-weixin/pages/index/index'), true);
-  assert.equal(isPlatformPagePath('pages/platforms/mp-weixin/index'), false);
-});
+for (const { testCase } of readCases(casesRoot)) {
+  test(testCase.name, () => {
+    if (testCase.kind === 'normalize-page-path') {
+      const input = requireObject(testCase.input, `${testCase.name}.input`);
+      const expected = requireObject(testCase.expected, `${testCase.name}.expected`);
 
-test('pagePathToWorkspaceFile maps page paths into UPW workspace files', () => {
-  const root = path.join('tmp', 'upw');
+      assert.equal(
+        normalizePagePath(requireString(input.path, `${testCase.name}.input.path`)),
+        expected.path,
+      );
+      return;
+    }
 
-  assert.equal(
-    pagePathToWorkspaceFile(root, 'pages/index/index'),
-    path.join(root, 'pages', 'index', 'index.upw.json'),
-  );
-  assert.equal(
-    pagePathToWorkspaceFile(root, 'platforms/mp-weixin/pages/index/index'),
-    path.join(root, 'platforms', 'mp-weixin', 'pages', 'index', 'index.upw.json'),
-  );
-});
+    if (testCase.kind === 'is-platform-page-path') {
+      for (const item of requireArray(testCase.inputs, `${testCase.name}.inputs`)) {
+        const input = requireObject(item, `${testCase.name}.inputs[]`);
+
+        assert.equal(
+          isPlatformPagePath(requireString(input.path, `${testCase.name}.inputs[].path`)),
+          input.expected,
+        );
+      }
+      return;
+    }
+
+    if (testCase.kind === 'page-path-to-workspace-file') {
+      const input = requireObject(testCase.input, `${testCase.name}.input`);
+      const root = path.join(
+        ...requireArray(input.root, `${testCase.name}.input.root`).map((item) => String(item)),
+      );
+
+      for (const item of requireArray(input.pages, `${testCase.name}.input.pages`)) {
+        const page = requireObject(item, `${testCase.name}.input.pages[]`);
+
+        assert.equal(
+          pagePathToWorkspaceFile(root, requireString(page.path, `${testCase.name}.input.pages[].path`)),
+          path.join(
+            ...requireArray(page.expected, `${testCase.name}.input.pages[].expected`).map((part) =>
+              String(part),
+            ),
+          ),
+        );
+      }
+      return;
+    }
+
+    throw new Error(`${testCase.name} has unsupported kind: ${testCase.kind}`);
+  });
+}

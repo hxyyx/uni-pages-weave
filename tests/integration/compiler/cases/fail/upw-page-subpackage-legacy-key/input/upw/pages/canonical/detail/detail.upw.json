@@ -1,7 +1,0 @@
-{
-  "$upw": {
-    "subpackage": "canonical",
-    "subPackage": "legacy"
-  },
-  "path": "pages/canonical/detail/detail"
-}

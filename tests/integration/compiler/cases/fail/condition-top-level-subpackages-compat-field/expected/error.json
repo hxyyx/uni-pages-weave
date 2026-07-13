@@ -1,0 +1,3 @@
+{
+  "messagePattern": "subpackages is a uni-app compatibility alias of subPackages and cannot be used as an app conditional patch target"
+}

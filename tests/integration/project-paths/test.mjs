@@ -4,9 +4,16 @@ import path from 'node:path';
 
 import { resolveProjectPaths } from '../../../packages/core/dist/index.js';
 import { actualRoot, cleanDir, repoRoot } from '../../support/files.mjs';
+import {
+  caseFixture,
+  readCases,
+  requireObject,
+  requireString,
+  requireStringValue,
+} from '../../support/cases.mjs';
 
 const projectActualRoot = path.join(actualRoot, 'integration', 'project-paths');
-const fixturesRoot = path.join(repoRoot, 'tests', 'integration', 'project-paths', 'fixtures');
+const casesRoot = path.join(repoRoot, 'tests', 'integration', 'project-paths', 'cases');
 
 function assertProjectPaths(projectDir, expected) {
   const paths = resolveProjectPaths(projectDir);
@@ -21,28 +28,28 @@ console.log('\nVerifying project path detection');
 
 cleanDir(projectActualRoot);
 
-const hbuildxProject = path.join(projectActualRoot, 'hbuildx');
-fs.cpSync(path.join(fixturesRoot, 'hbuilderx'), hbuildxProject, { recursive: true });
-assertProjectPaths(hbuildxProject, {
-  layout: 'root',
-  pagesJsonPath: 'pages.json',
-  upwSourceDir: '',
-});
+for (const { caseDir, testCase } of readCases(casesRoot)) {
+  if (testCase.kind !== 'project-paths') {
+    throw new Error(`${testCase.name} has unsupported kind: ${testCase.kind}`);
+  }
 
-const cliProject = path.join(projectActualRoot, 'cli');
-fs.cpSync(path.join(fixturesRoot, 'cli'), cliProject, { recursive: true });
-assertProjectPaths(cliProject, {
-  layout: 'src',
-  pagesJsonPath: path.join('src', 'pages.json'),
-  upwSourceDir: 'src',
-});
+  const projectDir = path.join(projectActualRoot, testCase.name);
 
-const mixedProject = path.join(projectActualRoot, 'mixed');
-fs.cpSync(path.join(fixturesRoot, 'mixed'), mixedProject, { recursive: true });
-assertProjectPaths(mixedProject, {
-  layout: 'src',
-  pagesJsonPath: path.join('src', 'pages.json'),
-  upwSourceDir: 'src',
-});
+  fs.cpSync(caseFixture(caseDir, testCase.fixture, `${testCase.name}.fixture`), projectDir, {
+    recursive: true,
+  });
+  assertProjectPaths(projectDir, {
+    ...requireObject(testCase.expected, `${testCase.name}.expected`),
+    layout: requireString(testCase.expected?.layout, `${testCase.name}.expected.layout`),
+    pagesJsonPath: requireString(
+      testCase.expected?.pagesJsonPath,
+      `${testCase.name}.expected.pagesJsonPath`,
+    ),
+    upwSourceDir: requireStringValue(
+      testCase.expected?.upwSourceDir,
+      `${testCase.name}.expected.upwSourceDir`,
+    ),
+  });
+}
 
 console.log('Project path detection passed.');

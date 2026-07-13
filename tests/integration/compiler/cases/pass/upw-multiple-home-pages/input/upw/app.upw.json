@@ -1,3 +1,5 @@
 {
-  "homePath": "pages/home/home"
+  "$upw": {
+    "homePath": "pages/home/home"
+  }
 }

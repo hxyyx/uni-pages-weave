@@ -9,7 +9,7 @@ const entry = resolve(currentDir, '../dist/index.js');
 
 if (!fs.existsSync(entry)) {
   console.error(
-    '[upw] ERROR: UPW CLI has not been built yet. Run `pnpm --filter @uni-pages-weave/cli build` first.',
+    'upw CLI has not been built yet. Run `pnpm --filter @uni-pages-weave/cli build` first.',
   );
   process.exit(1);
 }

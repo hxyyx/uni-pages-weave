@@ -1,0 +1,10 @@
+{
+  // #ifdef H5
+  "$upw": {},
+  // #endif
+  "pages": [
+    {
+      "path": "pages/index/index"
+    }
+  ]
+}

@@ -7,43 +7,74 @@ import {
   parseConditionBlocks,
   stripConditionalSections,
 } from '../../../packages/core/src/parser/condition-parser.js';
+import { caseFixture, readCases, requireArray, requireObject } from '../../support/cases.mjs';
 import { readText, repoRoot } from '../../support/files.mjs';
 
-const fixturesRoot = path.join(
-  repoRoot,
-  'tests',
-  'unit',
-  'core',
-  'fixtures',
-  'condition-parser',
-);
+const casesRoot = path.join(repoRoot, 'tests', 'unit', 'core', 'cases', 'condition-parser');
 
-function fixture(name: string): string {
-  return readText(path.join(fixturesRoot, name));
+function assertContains(text: string, values: unknown, label: string): void {
+  for (const value of requireArray(values ?? [], `${label}.contains`)) {
+    assert.equal(text.includes(String(value)), true, `${label} should contain ${String(value)}`);
+  }
 }
 
-test('normalizePagesJsonComments removes ordinary comments and preserves directives', () => {
-  const normalized = normalizePagesJsonComments(fixture('comments.json'));
+function assertNotContains(text: string, values: unknown, label: string): void {
+  for (const value of requireArray(values ?? [], `${label}.notContains`)) {
+    assert.equal(text.includes(String(value)), false, `${label} should not contain ${String(value)}`);
+  }
+}
 
-  assert.equal(normalized.includes('ordinary comment'), false);
-  assert.equal(normalized.includes('// #ifdef H5'), true);
-});
+function inputFiles(testCase: Record<string, unknown>, caseDir: string): string[] {
+  if (typeof testCase.input === 'string') {
+    return [caseFixture(caseDir, testCase.input, `${testCase.name}.input`)];
+  }
 
-test('normalizePagesJsonComments rejects block comment directives', () => {
-  assert.throws(() => normalizePagesJsonComments(fixture('block-directive.json')), /line comments/u);
-});
+  return requireArray(testCase.inputs, `${testCase.name}.inputs`).map((input, index) =>
+    caseFixture(caseDir, input, `${testCase.name}.inputs[${index}]`),
+  );
+}
 
-test('stripConditionalSections removes conditional blocks', () => {
-  const stripped = stripConditionalSections(fixture('conditional-sections.json'));
+for (const { caseDir, testCase } of readCases(casesRoot)) {
+  test(testCase.name, () => {
+    const expected = requireObject(testCase.expected, `${testCase.name}.expected`);
 
-  assert.equal(stripped.includes('pages/index/index'), true);
-  assert.equal(stripped.includes('pages/h5/index'), false);
-});
+    if (testCase.kind === 'normalize-comments') {
+      for (const inputFile of inputFiles(testCase, caseDir)) {
+        const normalized = normalizePagesJsonComments(readText(inputFile));
 
-test('parseConditionBlocks parses conditional page objects', () => {
-  const blocks = parseConditionBlocks(fixture('conditional-page-block.json'));
+        assertContains(normalized, expected.contains, testCase.name);
+        assertNotContains(normalized, expected.notContains, testCase.name);
+      }
+      return;
+    }
 
-  assert.equal(blocks.length, 1);
-  assert.equal(blocks[0]?.content.path, 'pages/h5/index');
-  assert.deepEqual(blocks[0]?.conditions[0]?.env, ['h5']);
-});
+    if (testCase.kind === 'strip-conditional-sections') {
+      const [inputFile] = inputFiles(testCase, caseDir);
+      const stripped = stripConditionalSections(readText(inputFile));
+
+      assertContains(stripped, expected.contains, testCase.name);
+      assertNotContains(stripped, expected.notContains, testCase.name);
+      return;
+    }
+
+    if (testCase.kind === 'parse-condition-blocks') {
+      const [inputFile] = inputFiles(testCase, caseDir);
+      const blocks = parseConditionBlocks(readText(inputFile));
+      const expectedBlocks = requireArray(expected.blocks, `${testCase.name}.expected.blocks`);
+
+      assert.deepEqual(
+        blocks.map((block) => ({
+          path:
+            block.content && typeof block.content === 'object'
+              ? (block.content as Record<string, unknown>).path
+              : undefined,
+          env: block.conditions[0]?.env,
+        })),
+        expectedBlocks,
+      );
+      return;
+    }
+
+    throw new Error(`${testCase.name} has unsupported kind: ${testCase.kind}`);
+  });
+}

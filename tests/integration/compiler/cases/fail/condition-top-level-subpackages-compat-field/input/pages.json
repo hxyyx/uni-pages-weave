@@ -1,0 +1,19 @@
+{
+  "pages": [
+    {
+      "path": "pages/index/index"
+    }
+  ],
+  // #ifdef H5
+  "subpackages": [
+    {
+      "root": "pages/account",
+      "pages": [
+        {
+          "path": "profile/profile"
+        }
+      ]
+    }
+  ]
+  // #endif
+}

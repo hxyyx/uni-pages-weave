@@ -1,8 +1,8 @@
 {
   "name": "uni-pages-weave",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "private": true,
-  "description": "UPW pages.json compiler toolkit monorepo.",
+  "description": "upw pages.json compiler toolkit monorepo.",
   "type": "module",
   "license": "MIT",
   "scripts": {

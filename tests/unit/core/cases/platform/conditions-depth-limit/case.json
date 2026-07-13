@@ -1,0 +1,25 @@
+{
+  "name": "conditionsToUpwMeta limits nested conditions to two layers",
+  "kind": "conditions-to-upw-meta",
+  "input": {
+    "valid": [],
+    "invalid": [
+      {
+        "directive": "ifdef",
+        "env": ["h5"]
+      },
+      {
+        "directive": "ifdef",
+        "env": ["mp-weixin"]
+      },
+      {
+        "directive": "ifndef",
+        "env": ["app-plus"]
+      }
+    ]
+  },
+  "expected": {
+    "valid": {},
+    "errorPattern": "at most two"
+  }
+}

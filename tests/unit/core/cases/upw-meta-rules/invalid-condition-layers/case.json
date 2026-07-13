@@ -1,0 +1,31 @@
+{
+  "name": "normalizeConditions rejects invalid condition layer structure",
+  "kind": "normalize-conditions-errors",
+  "inputs": [
+    {
+      "value": [
+        {
+          "when": ["h5"],
+          "unless": ["app-plus"]
+        }
+      ],
+      "fieldPath": "field",
+      "errorPattern": "cannot define both when and unless"
+    },
+    {
+      "value": [
+        {
+          "when": ["h5"]
+        },
+        {
+          "unless": ["mp-weixin"]
+        },
+        {
+          "when": ["app-plus"]
+        }
+      ],
+      "fieldPath": "field",
+      "errorPattern": "supports at most two condition layers"
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "name": "normalizeRequiredPlatformList trims, lowercases, and deduplicates platforms",
+  "kind": "normalize-required-platform-list",
+  "input": {
+    "value": [" H5 ", "h5", "MP-WEIXIN"],
+    "fieldPath": "field"
+  },
+  "expected": {
+    "value": ["h5", "mp-weixin"]
+  }
+}

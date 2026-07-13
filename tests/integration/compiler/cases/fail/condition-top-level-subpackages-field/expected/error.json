@@ -1,0 +1,3 @@
+{
+  "messagePattern": "subPackages is an upw compile-time structure field and cannot be used as an app conditional patch target"
+}

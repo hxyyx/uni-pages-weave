@@ -65,15 +65,15 @@ program.name(UPW_CLI_NAME).description(UPW_CLI_DESCRIPTION).version(PACKAGE_VERS
 
 program
   .command('init')
-  .description(`initialize an UPW workspace from uni-app ${UNI_PAGES_JSON_FILE}`)
-  .option('-f, --force', 'regenerate UPW files when an UPW workspace already exists')
+  .description(`initialize an upw workspace from uni-app ${UNI_PAGES_JSON_FILE}`)
+  .option('-f, --force', 'regenerate upw files when an upw workspace already exists')
   .action((options: CommandOptions) => {
     const { pagesJsonPath, upwSourceDir } = resolveCommandPaths();
     const existing = existingUpwFiles(upwSourceDir);
 
     if (existing.length > 0 && !options.force) {
       throw new Error(
-        `UPW files already exist under ${upwSourceDir}. ` +
+        `upw files already exist under ${upwSourceDir}. ` +
           `Run \`${UPW_CLI_NAME} init --force\` to regenerate them.`,
       );
     }
@@ -92,8 +92,8 @@ program
 
 program
   .command('build')
-  .description(`build ${UNI_PAGES_JSON_FILE} from an UPW workspace`)
-  .option('-w, --watch', `watch UPW files and rebuild ${UNI_PAGES_JSON_FILE}`)
+  .description(`build ${UNI_PAGES_JSON_FILE} from an upw workspace`)
+  .option('-w, --watch', `watch upw files and rebuild ${UNI_PAGES_JSON_FILE}`)
   .action((options: CommandOptions) => {
     const { pagesJsonPath, upwSourceDir } = resolveCommandPaths();
 

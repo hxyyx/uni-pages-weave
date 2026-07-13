@@ -1,0 +1,37 @@
+{
+  "name": "renderUpwToUniPagesJson renders standalone page data with pages wrapper",
+  "kind": "render-upw-to-uni",
+  "input": {
+    "render": {
+      "type": "page",
+      "data": {
+        "$upw": {
+          "when": ["mp-weixin"],
+          "patches": [
+            {
+              "when": ["h5"],
+              "patch": {
+                "style": {
+                  "navigationBarTitleText": "H5 Page"
+                }
+              }
+            }
+          ]
+        },
+        "path": "pages/demo/index",
+        "style": {
+          "navigationBarTitleText": "Demo"
+        }
+      }
+    }
+  },
+  "expected": {
+    "contains": [
+      "\"pages\": [",
+      "// #ifdef MP-WEIXIN",
+      "// #ifdef H5",
+      "\"path\": \"pages/demo/index\""
+    ],
+    "notContains": ["\"$upw\""]
+  }
+}

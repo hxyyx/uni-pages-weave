@@ -1,0 +1,5 @@
+{
+  // #ifdef H5 | MP-WEIXIN
+  "h5": true
+  // #endif
+}

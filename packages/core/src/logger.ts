@@ -1,4 +1,4 @@
-import pc from 'picocolors';
+﻿import pc from 'picocolors';
 
 export type UpwLogLevel = 'info' | 'warn' | 'error';
 
@@ -27,11 +27,7 @@ function label(level: UpwLogLevel, options?: FormatLogOptions): string {
   return value;
 }
 
-export function formatLog(
-  level: UpwLogLevel,
-  message: string,
-  options?: FormatLogOptions,
-): string {
+export function formatLog(level: UpwLogLevel, message: string, options?: FormatLogOptions): string {
   return `[upw] ${label(level, options)}: ${message}`;
 }
 

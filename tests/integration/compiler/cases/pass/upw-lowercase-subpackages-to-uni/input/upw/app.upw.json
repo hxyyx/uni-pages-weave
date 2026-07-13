@@ -1,12 +1,14 @@
 {
-  "homePath": "pages/index/index",
   "globalStyle": {
     "navigationBarTitleText": "Demo"
   },
-  "subpackages": [
+  "subPackages": [
     {
       "name": "account",
       "root": "pages/account"
     }
-  ]
+  ],
+  "$upw": {
+    "homePath": "pages/index/index"
+  },
 }

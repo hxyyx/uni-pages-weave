@@ -1,6 +1,8 @@
 {
-  "homePath": "pages/component/view/view",
-  "subpackages": [
+  "$upw": {
+    "homePath": "pages/component/view/view"
+  },
+  "subPackages": [
     {
       "root": "pages/API",
       "name": "pages/API"

@@ -1,0 +1,9 @@
+{
+  "name": "normalizePagesJsonComments removes ordinary comments and preserves directives",
+  "kind": "normalize-comments",
+  "input": "input.jsonc",
+  "expected": {
+    "contains": ["// #ifdef H5"],
+    "notContains": ["ordinary comment"]
+  }
+}

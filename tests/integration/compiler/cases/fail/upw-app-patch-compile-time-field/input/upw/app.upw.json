@@ -1,0 +1,16 @@
+{
+  "subPackages": [],
+  "$upw": {
+    "homePath": "pages/index/index",
+    "patches": [
+      {
+        "when": [
+          "h5"
+        ],
+        "patch": {
+          "subPackages": []
+        }
+      }
+    ]
+  }
+}

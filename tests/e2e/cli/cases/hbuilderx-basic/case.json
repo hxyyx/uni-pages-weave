@@ -1,0 +1,12 @@
+{
+  "name": "hbuilderx-basic",
+  "kind": "cli-roundtrip",
+  "fixture": "fixture",
+  "pagesJsonPath": "pages.json",
+  "upwSourceDir": "",
+  "commands": ["init", "build"],
+  "expectedFiles": [
+    "app.upw.json",
+    "pages/tabBar/component/component.upw.json"
+  ]
+}

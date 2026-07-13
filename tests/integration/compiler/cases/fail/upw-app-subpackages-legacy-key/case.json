@@ -1,5 +1,5 @@
 {
-  "name": "upw-app-subpackages-legacy-key",
+  "name": "upw-app-generated-pages-field",
   "kind": "upw-to-uni-error",
   "input": "input/upw",
   "expectedError": "expected/error.json"

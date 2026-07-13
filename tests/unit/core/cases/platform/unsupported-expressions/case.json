@@ -1,0 +1,14 @@
+{
+  "name": "parseConditionEnv does not reject unsupported expressions",
+  "kind": "parse-condition-env-list",
+  "inputs": [
+    {
+      "condition": "MP-WEIXIN | H5",
+      "expected": ["mp-weixin | h5"]
+    },
+    {
+      "condition": "MP-WEIXIN && H5",
+      "expected": ["mp-weixin && h5"]
+    }
+  ]
+}

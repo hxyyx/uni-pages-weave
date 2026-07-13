@@ -1,0 +1,10 @@
+{
+  "name": "parseConditionEnv normalizes OR conditions",
+  "kind": "parse-condition-env",
+  "input": {
+    "condition": "MP-WEIXIN || H5"
+  },
+  "expected": {
+    "env": ["mp-weixin", "h5"]
+  }
+}

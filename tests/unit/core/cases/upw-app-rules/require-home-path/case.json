@@ -1,0 +1,16 @@
+{
+  "name": "validateUpwAppConfig requires $upw.homePath",
+  "kind": "validate-upw-app-errors",
+  "inputs": [
+    {
+      "config": {},
+      "errorPattern": "app\\.upw\\.json\\.\\$upw\\.homePath must be a non-empty string"
+    },
+    {
+      "config": {
+        "$upw": {}
+      },
+      "errorPattern": "app\\.upw\\.json\\.\\$upw\\.homePath must be a non-empty string"
+    }
+  ]
+}

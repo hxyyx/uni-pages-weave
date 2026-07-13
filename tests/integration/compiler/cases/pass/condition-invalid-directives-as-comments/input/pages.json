@@ -1,0 +1,19 @@
+{
+  /* #ifdef H5 */
+  "globalStyle": {
+    // #ifdef H5 && MP-WEIXIN
+    "navigationBarTitleText": "Demo",
+    // #endif
+    // #ifdef H5 | MP-WEIXIN
+    "backgroundColor": "#ffffff"
+    // #endif
+  },
+  "pages": [
+    {
+      "path": "pages/index/index",
+      "style": {
+        "navigationBarTitleText": "Home"
+      }
+    }
+  ]
+}

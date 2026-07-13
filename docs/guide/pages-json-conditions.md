@@ -1,12 +1,15 @@
 # pages.json 条件编译支持
 
-upw 支持把 `pages.json` 中的 uni-app 条件编译注释转换为 `$upw` 条件配置，并能在 `build` 时重新输出条件注释。
+upw 支持把 `pages.json` 中常用的 uni-app 条件编译注释转换为 `$upw` 条件配置，并能在 `build` 时重新输出条件注释。
 
 ## 书写约束
 
-- 条件指令只支持 `// #ifdef ...`、`// #ifndef ...` 和 `// #endif`。
-- 条件指令必须单独占一整行，不能写成块注释，也不能写在属性行尾。
-- 条件表达式只支持 `||`，不支持 `&&` 或单个 `|`。
+upw 会把条件编译收敛到结构化的页面条件和字段补丁模型中，只识别能稳定转换为 `.upw.json` 结构的条件注释。`upw init` 不是 uni-app `pages.json` 的条件编译 lint；原始 `pages.json` 是否能在 uni-app 中正常工作，仍由 uni-app 编译环境决定。
+
+- 只有格式完整的整行 `// #ifdef ...`、`// #ifndef ...` 和 `// #endif` 会被识别为条件编译指令。
+- `#ifdef` / `#ifndef` 后的平台表达式支持单个平台 token，或多个平台 token 用 `||` 连接；平台 token 支持字母、数字、下划线和短横线。
+- `//` 后、指令后、`||` 两侧的空格可以省略或保留。
+- 块注释、属性行尾注释、缺少平台值、使用 `&&` 或单个 `|` 的注释不会进入 upw 条件编译流程，会作为普通 JSONC 注释处理。
 - 同一层条件数组内是或关系；嵌套条件层之间是同时满足关系。
 
 ## 支持的写法
@@ -172,7 +175,7 @@ pages.json：
 ```json
 {
   "$upw": {
-    "subpackageName": "pages/API",
+    "subPackageName": "pages/API",
     "when": ["app-plus"]
   },
   "path": "pages/API/map-search/map-search",
@@ -182,7 +185,7 @@ pages.json：
 }
 ```
 
-分包没有声明 `name` 时，upw 会用分包 `root` 作为 `subpackageName`。
+分包没有声明 `name` 时，upw 会用分包 `root` 作为 `subPackageName`。
 
 ### 应用字段带条件
 
@@ -213,14 +216,8 @@ pages.json：
 
 ```json
 {
-  "homePath": "pages/index/index",
-  "globalStyle": {
-    "backgroundColorTop": "#F4F5F6",
-    "h5": {
-      "maxWidth": 1190
-    }
-  },
   "$upw": {
+    "homePath": "pages/index/index",
     "patches": [
       {
         "when": ["mp-360"],
@@ -229,6 +226,49 @@ pages.json：
             "mp-360": {
               "navigationStyle": "custom"
             }
+          }
+        }
+      }
+    ]
+  },
+  "globalStyle": {
+    "backgroundColorTop": "#F4F5F6",
+    "h5": {
+      "maxWidth": 1190
+    }
+  }
+}
+```
+
+普通 App 顶层字段也可以整体带条件，upw 会把该字段转换为 `app.upw.json` 中的应用级 `$upw.patches`：
+
+```json
+{
+  // #ifdef H5
+  "globalStyle": {
+    "navigationBarTitleText": "H5"
+  },
+  // #endif
+  "pages": [
+    {
+      "path": "pages/index/index"
+    }
+  ]
+}
+```
+
+对应 `app.upw.json`：
+
+```json
+{
+  "$upw": {
+    "homePath": "pages/index/index",
+    "patches": [
+      {
+        "when": ["h5"],
+        "patch": {
+          "globalStyle": {
+            "navigationBarTitleText": "H5"
           }
         }
       }
@@ -399,28 +439,117 @@ pages.json：
 
 `children` 只支持一层，`children[].patch` 使用从页面或应用根节点开始的完整路径。
 
-## 不支持的写法
+### 数组项带条件
 
-以下写法是合法条件编译形式，但不能转换成当前 upw 配置。
-
-### 条件包裹顶层属性
+pages.json：
 
 ```json
 {
-  // #ifdef H5
   "globalStyle": {
-    "backgroundColorTop": "#F4F5F6"
+    "usingComponents": [
+      {
+        "name": "base-view"
+      },
+      // #ifdef MP-WEIXIN
+      {
+        "name": "wechat-view"
+      }
+      // #endif
+    ]
   },
-  // #endif
   "pages": [
     {
-      "path": "pages/component/view/view"
+      "path": "pages/index/index"
     }
   ]
 }
 ```
 
-顶层属性本身不能带条件；可以把条件写到属性内部的完整成员上。
+对应 `app.upw.json`：
+
+```json
+{
+  "$upw": {
+    "homePath": "pages/index/index",
+    "patches": [
+      {
+        "when": ["mp-weixin"],
+        "patch": {
+          "globalStyle": {
+            "usingComponents": [
+              {
+                "name": "base-view"
+              },
+              {
+                "name": "wechat-view"
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "globalStyle": {
+    "usingComponents": [
+      {
+        "name": "base-view"
+      }
+    ]
+  }
+}
+```
+
+数组项带条件时，upw 会把该条件下的完整数组值保存为对应字段的条件补丁。
+
+## 不支持的写法
+
+以下写法是合法条件编译形式，但不能转换成当前 upw 配置。
+
+### 页面数组只有条件页面
+
+```json
+{
+  "pages": [
+    // #ifdef H5
+    {
+      "path": "pages/h5/index"
+    }
+    // #endif
+  ]
+}
+```
+
+生成 `pages.json` 时，每个页面数组需要至少保留一个无条件页面项。`app.upw.json` 中的 `$upw.homePath` 也应指向主包中的无条件页面。
+
+### 条件包裹 upw 管理的顶层字段
+
+```json
+{
+  // #ifdef H5
+  "pages": [
+    {
+      "path": "pages/h5/index"
+    }
+  ],
+  // #endif
+  "subPackages": [
+    {
+      "root": "pages/account",
+      "pages": [
+        {
+          "path": "profile/profile"
+        }
+      ]
+    }
+  ]
+}
+```
+
+普通 App 顶层字段可以带条件，并会转换为应用级 `$upw.patches`。但 `$upw`、`pages`、`subPackages` 是 upw 管理字段，不能作为 App 条件 patch 的目标：
+
+- `$upw` 是 upw 元数据。
+- `pages` 由页面级 `.upw.json` 文件生成。
+- `subPackages` 是 upw 编译期结构字段，分包页面列表由页面级 `.upw.json` 文件生成。
 
 ### 条件包裹分包对象
 

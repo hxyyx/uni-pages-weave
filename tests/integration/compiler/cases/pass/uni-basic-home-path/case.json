@@ -1,0 +1,12 @@
+{
+  "name": "uni-basic-home-path",
+  "kind": "uni-to-upw",
+  "input": "input/pages.json",
+  "roundtrip": false,
+  "actual": {
+    "upw": "upw"
+  },
+  "expected": {
+    "upw": "expected/upw"
+  }
+}
