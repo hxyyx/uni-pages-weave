@@ -25,11 +25,7 @@ export function convertUpwAppFragmentToUniObject(
   label?: string,
 ): ConvertedUpwAppFragment {
   const validation = validateUpwAppConfig(app, { label });
-  const {
-    [UPW_META_KEY]: _upw,
-    [UPW_SUB_PACKAGES_KEY]: _subPackages,
-    ...baseApp
-  } = app;
+  const { [UPW_META_KEY]: _upw, [UPW_SUB_PACKAGES_KEY]: _subPackages, ...baseApp } = app;
 
   return {
     app: baseApp,

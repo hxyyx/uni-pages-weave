@@ -12,9 +12,7 @@ import type {
   UpwPageSchema,
   UpwSubPackage,
 } from '../spec/upw-spec.js';
-import {
-  UPW_META_KEY,
-} from '../spec/upw-spec.js';
+import { UPW_META_KEY } from '../spec/upw-spec.js';
 import {
   UNI_PAGES_KEY,
   UNI_PAGE_PATH_KEY,
@@ -22,7 +20,11 @@ import {
   UNI_SUB_PACKAGE_NAME_KEY,
   UNI_SUB_PACKAGE_ROOT_KEY,
 } from '../spec/uni-pages-spec.js';
-import { conditionsToUpwMeta, effectiveConditions, normalizePlatformEnv } from '../condition/condition-platform.js';
+import {
+  conditionsToUpwMeta,
+  effectiveConditions,
+  normalizePlatformEnv,
+} from '../condition/condition-platform.js';
 import { deepMerge, isPlainObject } from '../foundation/object.js';
 import {
   convertUniAppFragmentToUpwApp,
@@ -120,7 +122,9 @@ export function readUniPagesSubPackages(data: Record<string, unknown>): SubPacka
 
 function conditionGroupKey(conditions: ConditionNode[] = []): string {
   return conditions
-    .map((condition) => `${condition.directive}:${condition.env.map(normalizePlatformEnv).join('||')}`)
+    .map(
+      (condition) => `${condition.directive}:${condition.env.map(normalizePlatformEnv).join('||')}`,
+    )
     .join('&&');
 }
 
@@ -169,7 +173,8 @@ function mergeRawConditionPatches<
   return patches.reduce<TPatch[]>((merged, patch) => {
     const key = conditionGroupKey(patch.conditions);
     const target = merged.find(
-      (item) => conditionGroupKey(item.conditions) === key && canMergePatch(item.patch, patch.patch),
+      (item) =>
+        conditionGroupKey(item.conditions) === key && canMergePatch(item.patch, patch.patch),
     );
 
     if (!target) {
@@ -326,7 +331,10 @@ function subPackageForRoot(
 
 function conditionalPages(blocks: ConditionBlock[], subPackages: SubPackageConfig[]): SplitPage[] {
   return blocks
-    .filter((block) => isPlainObject(block.content) && typeof block.content[UNI_PAGE_PATH_KEY] === 'string')
+    .filter(
+      (block) =>
+        isPlainObject(block.content) && typeof block.content[UNI_PAGE_PATH_KEY] === 'string',
+    )
     .map((block) => {
       const content = block.content as Record<string, unknown>;
       const subPackage = subPackageForRoot(subPackages, block.subPackageRoot);

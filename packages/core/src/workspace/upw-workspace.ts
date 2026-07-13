@@ -1,16 +1,7 @@
 import path from 'node:path';
 
-import type {
-  UpwAppSchema,
-  UpwMeta,
-  UpwPageSchema,
-  UpwSubPackage,
-} from '../spec/upw-spec.js';
-import {
-  UPW_HOME_PATH_KEY,
-  UPW_META_KEY,
-  UPW_SUB_PACKAGES_KEY,
-} from '../spec/upw-spec.js';
+import type { UpwAppSchema, UpwMeta, UpwPageSchema, UpwSubPackage } from '../spec/upw-spec.js';
+import { UPW_HOME_PATH_KEY, UPW_META_KEY, UPW_SUB_PACKAGES_KEY } from '../spec/upw-spec.js';
 import {
   UNI_PAGE_PATH_KEY,
   UNI_SUB_PACKAGE_NAME_KEY,
@@ -133,7 +124,9 @@ export function relativeSubPackagePath(pagePath: string, subPackage: BuildSubPac
 }
 
 export function isConditionalPageEntry(entry: OutputPage): boolean {
-  return Boolean(entry.meta?.conditions?.length || entry.meta?.when?.length || entry.meta?.unless?.length);
+  return Boolean(
+    entry.meta?.conditions?.length || entry.meta?.when?.length || entry.meta?.unless?.length,
+  );
 }
 
 function normalizedEntryPath(entry: OutputPage): string {
@@ -141,7 +134,9 @@ function normalizedEntryPath(entry: OutputPage): string {
 }
 
 function normalizedPlatformSet(values: string[]): string {
-  return Array.from(new Set(values.map((value) => normalizePlatformEnv(value)))).sort().join('|');
+  return Array.from(new Set(values.map((value) => normalizePlatformEnv(value))))
+    .sort()
+    .join('|');
 }
 
 function conditionGroupKey(entry: OutputPage, kind: 'when' | 'unless'): string | undefined {
@@ -320,9 +315,13 @@ export function sortMainPageEntries(
     }
   }
 
-  const remainingPages = mainPages.filter((entry) => !selectedPaths.has(normalizedEntryPath(entry)));
+  const remainingPages = mainPages.filter(
+    (entry) => !selectedPaths.has(normalizedEntryPath(entry)),
+  );
   const sortedRemainingPages = sortConditionalPageEntries(remainingPages);
-  const stableRemainingPages = sortedRemainingPages.filter((entry) => !isConditionalPageEntry(entry));
+  const stableRemainingPages = sortedRemainingPages.filter(
+    (entry) => !isConditionalPageEntry(entry),
+  );
   const conditionalRemainingPages = sortedRemainingPages.filter(isConditionalPageEntry);
 
   return [
@@ -526,11 +525,14 @@ export function buildUniPagesJsonWorkspaceFromUpwProject(options: {
 
   for (const source of options.pageSources) {
     const isPlatformPage = isPlatformWorkspaceFile(options.sourceDir, source.file);
-    const { page: config, meta } = convertUpwPageFragmentToUniPageEntry(source.data as UpwPageSchema, {
-      forbidUpw: isPlatformPage,
-      forbidUpwMessage: `${source.file} cannot define ${UPW_META_KEY} because platform-specific upw files cannot contain upw metadata.`,
-      label: source.file,
-    });
+    const { page: config, meta } = convertUpwPageFragmentToUniPageEntry(
+      source.data as UpwPageSchema,
+      {
+        forbidUpw: isPlatformPage,
+        forbidUpwMessage: `${source.file} cannot define ${UPW_META_KEY} because platform-specific upw files cannot contain upw metadata.`,
+        label: source.file,
+      },
+    );
 
     validateFilePath(options.sourceDir, source.file, config[UNI_PAGE_PATH_KEY] as string);
 

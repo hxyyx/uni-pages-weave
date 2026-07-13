@@ -7,9 +7,7 @@ import {
   UPW_META_PATCHES_KEY,
   UPW_META_SUB_PACKAGE_NAME_KEY,
 } from '../spec/upw-spec.js';
-import {
-  UNI_PAGE_PATH_KEY,
-} from '../spec/uni-pages-spec.js';
+import { UNI_PAGE_PATH_KEY } from '../spec/uni-pages-spec.js';
 import { isPlainObject } from '../foundation/object.js';
 import {
   assertAllowedKeys,
@@ -159,7 +157,9 @@ function validatePagePatchTargets(meta: UpwMeta | undefined, label: string): voi
 
 function validatePagePatchTargetFields(patch: Record<string, unknown>, fieldPath: string): void {
   if (Object.prototype.hasOwnProperty.call(patch, UPW_META_KEY)) {
-    throw new Error(`${fieldPath}.${UPW_META_KEY} is upw metadata and cannot be conditionally patched.`);
+    throw new Error(
+      `${fieldPath}.${UPW_META_KEY} is upw metadata and cannot be conditionally patched.`,
+    );
   }
 
   if (Object.prototype.hasOwnProperty.call(patch, UNI_PAGE_PATH_KEY)) {
@@ -194,5 +194,3 @@ export function validateUpwPageConfig(
     meta,
   };
 }
-
-

@@ -1,6 +1,11 @@
 ﻿import uniq from 'lodash-es/uniq.js';
 
-import type { ConditionLayer, ConditionMeta, ConditionalChildPatch, ConditionalPatch } from '../spec/upw-spec.js';
+import type {
+  ConditionLayer,
+  ConditionMeta,
+  ConditionalChildPatch,
+  ConditionalPatch,
+} from '../spec/upw-spec.js';
 import {
   UPW_CONDITIONAL_CHILD_PATCH_ALLOWED_KEYS,
   UPW_CONDITIONAL_PATCH_ALLOWED_KEYS,
@@ -157,7 +162,9 @@ function normalizeConditionLayer(value: unknown, fieldPath: string): ConditionLa
   const hasUnless = hasOwnKey(value, UPW_META_UNLESS_KEY);
 
   if (hasWhen && hasUnless) {
-    throw new Error(`${fieldPath} cannot define both ${UPW_META_WHEN_KEY} and ${UPW_META_UNLESS_KEY}.`);
+    throw new Error(
+      `${fieldPath} cannot define both ${UPW_META_WHEN_KEY} and ${UPW_META_UNLESS_KEY}.`,
+    );
   }
 
   if (!hasWhen && !hasUnless) {
@@ -166,18 +173,20 @@ function normalizeConditionLayer(value: unknown, fieldPath: string): ConditionLa
 
   if (hasWhen) {
     return {
-      when: normalizeRequiredPlatformList(
-        value[UPW_META_WHEN_KEY],
-        `${fieldPath}.${UPW_META_WHEN_KEY}`,
-      ) ?? [],
+      when:
+        normalizeRequiredPlatformList(
+          value[UPW_META_WHEN_KEY],
+          `${fieldPath}.${UPW_META_WHEN_KEY}`,
+        ) ?? [],
     };
   }
 
   return {
-    unless: normalizeRequiredPlatformList(
-      value[UPW_META_UNLESS_KEY],
-      `${fieldPath}.${UPW_META_UNLESS_KEY}`,
-    ) ?? [],
+    unless:
+      normalizeRequiredPlatformList(
+        value[UPW_META_UNLESS_KEY],
+        `${fieldPath}.${UPW_META_UNLESS_KEY}`,
+      ) ?? [],
   };
 }
 
@@ -296,5 +305,3 @@ export function normalizeConditionalPatch(
     ...(children?.length ? { children } : {}),
   };
 }
-
-

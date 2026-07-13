@@ -3,10 +3,7 @@
   resolveUpwBuildContext,
   watchUniPagesJsonFromUpwSource,
 } from './compiler/upw-to-uni-compiler.js';
-export {
-  extractUpwSourceFromUniPagesJson,
-  initUpw,
-} from './compiler/uni-to-upw-compiler.js';
+export { extractUpwSourceFromUniPagesJson, initUpw } from './compiler/uni-to-upw-compiler.js';
 export { renderUpwToUniPagesJson } from './renderer/uni-pages-json-renderer.js';
 export { resolveProjectPaths } from './workspace/uni-project-paths.js';
 export type {
@@ -26,5 +23,3 @@ export type {
   RenderUpwWorkspaceData,
 } from './renderer/uni-pages-json-renderer.js';
 export type { ProjectPaths, UniAppProjectMode } from './workspace/uni-project-paths.js';
-
-

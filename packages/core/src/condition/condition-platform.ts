@@ -1,14 +1,7 @@
 ﻿import uniq from 'lodash-es/uniq.js';
 
-import type {
-  ConditionLayer,
-  ConditionMeta,
-  PlatformCondition,
-} from '../spec/upw-spec.js';
-import {
-  UPW_IFDEF_DIRECTIVE,
-  UPW_IFNDEF_DIRECTIVE,
-} from '../spec/upw-spec.js';
+import type { ConditionLayer, ConditionMeta, PlatformCondition } from '../spec/upw-spec.js';
+import { UPW_IFDEF_DIRECTIVE, UPW_IFNDEF_DIRECTIVE } from '../spec/upw-spec.js';
 
 export type ConditionalMeta = ConditionMeta;
 
@@ -39,9 +32,7 @@ export function envToCondition(env: string[]): string {
 function conditionToLayer(condition: PlatformCondition): ConditionLayer {
   const env = condition.env.map(normalizePlatformEnv);
 
-  return condition.directive === UPW_IFNDEF_DIRECTIVE
-    ? { unless: uniq(env) }
-    : { when: uniq(env) };
+  return condition.directive === UPW_IFNDEF_DIRECTIVE ? { unless: uniq(env) } : { when: uniq(env) };
 }
 
 export function conditionLayerToPlatformCondition(layer: ConditionLayer): PlatformCondition {
@@ -85,5 +76,3 @@ export function conditionsToUpwMeta(conditions: PlatformCondition[]): Conditiona
     conditions: layers,
   };
 }
-
-

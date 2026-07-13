@@ -1,9 +1,6 @@
 import fs from 'fs-extra';
 
-import type { AppConditionPatch,
-  ConditionBlock,
-  PageConditionPatch,
-} from '../spec/upw-spec.js';
+import type { AppConditionPatch, ConditionBlock, PageConditionPatch } from '../spec/upw-spec.js';
 import {
   DEFAULT_TEXT_ENCODING,
   UNI_SUB_PACKAGES_COMPAT_KEY,
@@ -56,5 +53,3 @@ export function parsePagesSource(filePath: string): ParsedPagesJson {
     conditionPatches: parseConditionPatches(source),
   };
 }
-
-

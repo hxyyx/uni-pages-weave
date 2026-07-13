@@ -9,15 +9,9 @@ import {
   UPW_META_PATCHES_KEY,
   UPW_SUB_PACKAGES_KEY,
 } from '../spec/upw-spec.js';
-import {
-  UNI_PAGES_KEY,
-  UNI_SUB_PACKAGES_COMPAT_KEY,
-} from '../spec/uni-pages-spec.js';
+import { UNI_PAGES_KEY, UNI_SUB_PACKAGES_COMPAT_KEY } from '../spec/uni-pages-spec.js';
 import { isPlainObject } from '../foundation/object.js';
-import {
-  assertAllowedKeys,
-  normalizeConditionalPatch,
-} from './upw-meta-rules.js';
+import { assertAllowedKeys, normalizeConditionalPatch } from './upw-meta-rules.js';
 
 export interface ValidateUpwAppConfigOptions {
   label?: string;
@@ -168,5 +162,3 @@ export function validateUpwAppConfig(
 
   return meta;
 }
-
-

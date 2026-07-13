@@ -41,18 +41,23 @@ npm run release
 
 1. 扫描 `packages/*/package.json`，过滤 `private === true` 的包。
 2. 校验发布包都属于 `@uni-pages-weave/*`，并配置了 npm registry 和 public access。
-3. 交互选择 `patch` / `minor` / `major`。
-4. 根据根目录 `package.json.version` 计算下一版本。
-5. 将下一版本写入根包和所有发布包。
-6. 同步发布包之间的非 `workspace:` 内部依赖版本；`workspace:*` 等 workspace 协议保持不变。
-7. 创建 `.upw/release-notes-<version>.md`。
-8. 提示手动编辑该临时日志文件，回到终端按回车继续。
-9. 运行完整验证：构建、lint、测试。
-10. 检查所有发布包的目标版本在 npm registry 中都不存在。
-11. 逐个执行 `pnpm publish`。
-12. 发布成功后读取临时日志，去掉 HTML 注释和空白。
-13. 如果日志非空，将内容写入根目录 `CHANGELOG.md` 顶部。
-14. 删除 `.upw/release-notes-<version>.md`。
+3. 运行无写入预检：格式检查、完整验证、版本同步检查。
+4. 交互选择 `patch` / `minor` / `major`。
+5. 根据根目录 `package.json.version` 计算下一版本。
+6. 校验 npm 认证，并检查所有发布包的目标版本在 npm registry 中都不存在。
+7. 快照根包和发布包的 `package.json`，进入可回滚发布准备阶段。
+8. 将下一版本写入根包和所有发布包。
+9. 同步发布包之间的非 `workspace:` 内部依赖版本；`workspace:*` 等 workspace 协议保持不变。
+10. 创建 `.upw/release-notes-<version>.md`。
+11. 提示手动编辑该临时日志文件，回到终端按回车继续。
+12. 重新构建发布产物，确保 `dist` 使用新版本号。
+13. 运行版本同步检查。
+14. 检查发布入口文件，并对 CLI bin 执行基础 smoke test。
+15. 对每个发布包执行 `pnpm pack --dry-run`。
+16. 逐个执行 `pnpm publish`。
+17. 发布成功后读取临时日志，去掉 HTML 注释和空白。
+18. 如果日志非空，将内容写入根目录 `CHANGELOG.md` 顶部。
+19. 删除 `.upw/release-notes-<version>.md`。
 
 ## 发布日志
 
@@ -72,7 +77,9 @@ npm run release
 历史内容
 ```
 
-如果发布失败，脚本不会合并 changelog，也不会删除临时日志，方便修复后继续参考。
+如果在 `pnpm publish` 开始前失败，脚本会恢复本次 release 改写的版本文件，并保留临时日志文件，方便修复后继续参考。
+
+如果 `pnpm publish` 已经开始后失败，脚本不会自动回滚 npm 上已经发布的包，需要人工确认 npm registry 状态后继续处理。
 
 ## 注意事项
 

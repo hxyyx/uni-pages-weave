@@ -14,5 +14,3 @@ export function deepMerge(
     return isPlainObject(current) && isPlainObject(value) ? undefined : value;
   }) as Record<string, unknown>;
 }
-
-

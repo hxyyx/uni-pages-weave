@@ -4,11 +4,7 @@
   ConditionalPatch,
   UpwMeta,
 } from '../spec/upw-spec.js';
-import {
-  UPW_ENDIF_COMMENT,
-  UPW_IFDEF_COMMENT,
-  UPW_IFNDEF_COMMENT,
-} from '../spec/upw-spec.js';
+import { UPW_ENDIF_COMMENT, UPW_IFDEF_COMMENT, UPW_IFNDEF_COMMENT } from '../spec/upw-spec.js';
 import { stringifyJsonValue } from '../foundation/json.js';
 import { isPlainObject } from '../foundation/object.js';
 import { envToCondition, normalizePlatformEnv } from '../condition/condition-platform.js';
@@ -155,7 +151,10 @@ export function emitConditionalMember(
 
 function patchMembersForKey(key: string, patches: EmitterPatch[]): ConditionalMember[] {
   return patches
-    .filter((patch) => isPlainObject(patch.patch) && Object.prototype.hasOwnProperty.call(patch.patch, key))
+    .filter(
+      (patch) =>
+        isPlainObject(patch.patch) && Object.prototype.hasOwnProperty.call(patch.patch, key),
+    )
     .map((patch) => ({
       key,
       value: patch.patch[key],
@@ -239,9 +238,7 @@ function emitObject(
   patches: EmitterPatch[] = [],
 ): string {
   const lines = ['{'];
-  const keys = Array.from(
-    new Set([...Object.keys(value), ...patches.flatMap(patchKeys)]),
-  );
+  const keys = Array.from(new Set([...Object.keys(value), ...patches.flatMap(patchKeys)]));
   const baseMembers: string[][] = [];
   const conditionalMembers: ConditionalOutput[] = [];
 
@@ -284,9 +281,7 @@ function emitObject(
   });
 
   conditionalMembers.forEach((output, index) => {
-    lines.push(
-      ...conditionalOutputLines(output, level + 1, baseMembers.length > 0 || index > 0),
-    );
+    lines.push(...conditionalOutputLines(output, level + 1, baseMembers.length > 0 || index > 0));
   });
 
   lines.push(`${indent(level)}}`);
@@ -351,5 +346,3 @@ export function emitConditionalValue(
     ...conditionEnd(normalized).map((line) => `${indent(level)}${line}`),
   ].join('\n');
 }
-
-

@@ -3,7 +3,11 @@
 import fs from 'fs-extra';
 
 import { UPW_CLI_NAME } from '../spec/upw-spec.js';
-import { DEFAULT_TEXT_ENCODING, UNI_PAGES_JSON_BACKUP_FILE, UNI_PAGES_JSON_FILE } from '../spec/uni-pages-spec.js';
+import {
+  DEFAULT_TEXT_ENCODING,
+  UNI_PAGES_JSON_BACKUP_FILE,
+  UNI_PAGES_JSON_FILE,
+} from '../spec/uni-pages-spec.js';
 import { parsePagesSource } from '../parser/uni-pages-json-parser.js';
 import { renderUpwJson } from '../renderer/upw-json-renderer.js';
 import { buildUpwWorkspaceFilesFromUniPagesJson } from '../workspace/uni-pages-workspace.js';

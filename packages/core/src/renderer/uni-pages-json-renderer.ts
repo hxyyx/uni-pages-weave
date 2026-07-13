@@ -21,7 +21,11 @@ import {
   type ConditionalMeta,
 } from './uni-pages-json-condition-emitter.js';
 
-export type { BuildSubPackage, OutputPage, RenderUpwWorkspaceData } from '../workspace/upw-workspace.js';
+export type {
+  BuildSubPackage,
+  OutputPage,
+  RenderUpwWorkspaceData,
+} from '../workspace/upw-workspace.js';
 
 export type RenderUpwToUniPagesJsonInput =
   | {
@@ -146,7 +150,8 @@ export function emitObjectMemberBlocks(
 
   for (const key of keys) {
     const keyPatches = patches.filter(
-      (patch) => isPlainObject(patch.patch) && Object.prototype.hasOwnProperty.call(patch.patch, key),
+      (patch) =>
+        isPlainObject(patch.patch) && Object.prototype.hasOwnProperty.call(patch.patch, key),
     );
     const hasBaseMember = Object.prototype.hasOwnProperty.call(value, key);
     const memberObject =
@@ -164,16 +169,18 @@ export function emitObjectMemberBlocks(
             [],
             leadingComma || index > 0,
           ).split('\n'),
-          ...patchChildrenForKey(patch, key).map((child) =>
-            emitConditionalMember(
-              key,
-              child.patch[key],
-              childPatchMeta(child),
-              level + 1,
-              [],
-              true,
-            ),
-          ).flatMap((block) => block.split('\n')),
+          ...patchChildrenForKey(patch, key)
+            .map((child) =>
+              emitConditionalMember(
+                key,
+                child.patch[key],
+                childPatchMeta(child),
+                level + 1,
+                [],
+                true,
+              ),
+            )
+            .flatMap((block) => block.split('\n')),
         ]),
       );
       continue;
@@ -200,16 +207,18 @@ export function emitObjectMemberBlocks(
             [],
             leadingComma || index > 0,
           ).split('\n'),
-          ...patchChildrenForKey(patch, key).map((child) =>
-            emitConditionalMember(
-              key,
-              child.patch[key],
-              childPatchMeta(child),
-              level + 1,
-              [],
-              true,
-            ),
-          ).flatMap((block) => block.split('\n')),
+          ...patchChildrenForKey(patch, key)
+            .map((child) =>
+              emitConditionalMember(
+                key,
+                child.patch[key],
+                childPatchMeta(child),
+                level + 1,
+                [],
+                true,
+              ),
+            )
+            .flatMap((block) => block.split('\n')),
         ]),
       );
     }
@@ -234,11 +243,7 @@ function renderAppConfigObject(
   app: Record<string, unknown>,
   appPatches: NonNullable<UpwMeta['patches']>,
 ): string {
-  const {
-    [UPW_SUB_PACKAGES_KEY]: _subPackages,
-    [UPW_META_KEY]: _upw,
-    ...baseApp
-  } = app;
+  const { [UPW_SUB_PACKAGES_KEY]: _subPackages, [UPW_META_KEY]: _upw, ...baseApp } = app;
   const lines = ['{'];
   const { base: appMembers, conditional: conditionalAppMembers } = emitObjectMemberBlocks(
     baseApp,
@@ -268,11 +273,7 @@ export function renderUniPagesJsonWithConditionComments(
   subPackages: BuildSubPackage[],
   subPackagePages: Map<string, OutputPage[]>,
 ): string {
-  const {
-    [UPW_SUB_PACKAGES_KEY]: _subPackages,
-    [UPW_META_KEY]: _upw,
-    ...baseApp
-  } = app;
+  const { [UPW_SUB_PACKAGES_KEY]: _subPackages, [UPW_META_KEY]: _upw, ...baseApp } = app;
   const lines = ['{'];
   const { base: appMembers, conditional: conditionalAppMembers } = emitObjectMemberBlocks(
     baseApp,

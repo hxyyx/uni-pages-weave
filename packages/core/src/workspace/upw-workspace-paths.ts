@@ -82,5 +82,3 @@ export function upwWatchPatterns(rootDir: string): string[] {
     path.join(rootDir, UPW_PLATFORMS_DIR, '**', UPW_PAGE_FILE_GLOB),
   ];
 }
-
-

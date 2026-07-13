@@ -65,8 +65,7 @@ export interface PlatformCondition {
 export type ConditionNode = PlatformCondition;
 
 export type ConditionLayer =
-  | { when: string[]; unless?: never }
-  | { unless: string[]; when?: never };
+  { when: string[]; unless?: never } | { unless: string[]; when?: never };
 
 export interface ConditionMeta {
   conditions?: ConditionLayer[];
@@ -147,7 +146,3 @@ export interface UpwPageSchema extends Record<string, unknown> {
   path: string;
   style?: Record<string, unknown>;
 }
-
-
-
-

@@ -3,5 +3,3 @@
 export function renderUpwJson(value: unknown): string {
   return stringifyJson(value);
 }
-
-

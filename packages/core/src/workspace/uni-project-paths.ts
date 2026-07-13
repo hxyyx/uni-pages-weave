@@ -2,9 +2,7 @@
 
 import fs from 'fs-extra';
 
-import {
-  UPW_TARGET_DIR,
-} from '../spec/upw-spec.js';
+import { UPW_TARGET_DIR } from '../spec/upw-spec.js';
 import {
   DEFAULT_PROJECT_DIR,
   UNI_PAGES_JSON_FILE,
@@ -109,5 +107,3 @@ export function resolveProjectPaths(
     `No ${UNI_PAGES_JSON_FILE} found under ${resolvedProjectDir}. Expected ${UNI_PAGES_JSON_FILE} or ${UNI_PROJECT_SRC_DIR}/${UNI_PAGES_JSON_FILE}.`,
   );
 }
-
-

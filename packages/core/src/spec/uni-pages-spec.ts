@@ -16,5 +16,3 @@ export const UNI_SUB_PACKAGES_COMPAT_KEY = 'subpackages';
 export const UNI_PAGE_PATH_KEY = 'path';
 export const UNI_SUB_PACKAGE_NAME_KEY = 'name';
 export const UNI_SUB_PACKAGE_ROOT_KEY = 'root';
-
-

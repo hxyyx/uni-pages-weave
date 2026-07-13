@@ -49,5 +49,3 @@ function escapePrivateUseCharacters(value: string): string {
     return `\\u${codePoint.toString(16).padStart(4, '0')}`;
   });
 }
-
-

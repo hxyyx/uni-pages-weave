@@ -27,11 +27,7 @@ function label(level: UpwLogLevel, options?: FormatLogOptions): string {
   return value;
 }
 
-export function formatLog(
-  level: UpwLogLevel,
-  message: string,
-  options?: FormatLogOptions,
-): string {
+export function formatLog(level: UpwLogLevel, message: string, options?: FormatLogOptions): string {
   return `[upw] ${label(level, options)}: ${message}`;
 }
 
@@ -46,5 +42,3 @@ export const logger = {
     console.error(formatLog('error', message));
   },
 };
-
-
