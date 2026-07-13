@@ -5,6 +5,7 @@ export default defineConfig({
   format: ['esm', 'cjs'],
   dts: true,
   clean: true,
+  minify: true,
   splitting: false,
   external: ['chokidar', 'fs-extra', 'jsonc-parser', 'lodash-es', 'picocolors'],
   outExtension({ format }) {
