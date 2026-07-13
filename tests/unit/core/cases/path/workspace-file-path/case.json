@@ -1,5 +1,5 @@
 {
-  "name": "pagePathToWorkspaceFile maps page paths into UPW workspace files",
+  "name": "pagePathToWorkspaceFile maps page paths into upw workspace files",
   "kind": "page-path-to-workspace-file",
   "input": {
     "root": ["tmp", "upw"],

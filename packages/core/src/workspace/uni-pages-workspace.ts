@@ -442,7 +442,7 @@ export function buildUpwWorkspaceFilesFromUniPagesJson(
 
     validateUpwPageConfig(config, {
       forbidUpw,
-      forbidUpwMessage: `${outputFile} cannot define ${UPW_META_KEY} because platform-specific UPW files cannot contain UPW metadata.`,
+      forbidUpwMessage: `${outputFile} cannot define ${UPW_META_KEY} because platform-specific upw files cannot contain upw metadata.`,
       label: `Page "${path}"`,
     });
 

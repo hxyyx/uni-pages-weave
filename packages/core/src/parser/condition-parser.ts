@@ -489,9 +489,25 @@ interface ConditionalMemberPatch {
 interface CollectConditionalMemberPatchOptions {
   ancestorConditionCount?: number;
   baseConditionCount?: number;
-  forbidTopLevel?: boolean;
+  deniedTopLevelKeys?: ReadonlyMap<string, string>;
   skipRanges?: Array<readonly [number, number]>;
 }
+
+const APP_PATCH_DENIED_TOP_LEVEL_KEYS = new Map<string, string>([
+  ['$upw', '$upw is upw metadata and cannot be used as an app conditional patch target.'],
+  [
+    UNI_PAGES_KEY,
+    `${UNI_PAGES_KEY} is generated from page-level upw files and cannot be used as an app conditional patch target.`,
+  ],
+  [
+    UNI_SUB_PACKAGES_KEY,
+    `${UNI_SUB_PACKAGES_KEY} is an upw compile-time structure field and cannot be used as an app conditional patch target.`,
+  ],
+  [
+    UNI_SUB_PACKAGES_COMPAT_KEY,
+    `${UNI_SUB_PACKAGES_COMPAT_KEY} is a uni-app compatibility alias of ${UNI_SUB_PACKAGES_KEY} and cannot be used as an app conditional patch target.`,
+  ],
+]);
 
 function relativeConditions(
   conditions: ConditionNode[],
@@ -609,8 +625,11 @@ function collectConditionalMemberPatches(
     const hasNewCondition = propertyConditions.length > ancestorConditionCount;
 
     if (hasNewCondition && conditions.length > 0) {
-      if (options.forbidTopLevel && parentPath.length === 0) {
-        throw new Error('Top-level pages.json properties cannot be conditionally compiled.');
+      const deniedReason =
+        parentPath.length === 0 ? options.deniedTopLevelKeys?.get(key) : undefined;
+
+      if (deniedReason) {
+        throw new Error(deniedReason);
       }
 
       const value = parseNodeValue(code, valueNode);
@@ -623,7 +642,10 @@ function collectConditionalMemberPatches(
       }
     }
 
-    if (valueNode.type === 'array' && !(options.forbidTopLevel && parentPath.length === 0)) {
+    const isDeniedTopLevelKey =
+      parentPath.length === 0 && options.deniedTopLevelKeys?.has(key) === true;
+
+    if (valueNode.type === 'array' && !isDeniedTopLevelKey) {
       patches.push(
         ...collectConditionalArrayMemberPatches(
           code,
@@ -703,10 +725,15 @@ function parseValidatedPagesRoot(
   return root;
 }
 
-function subPackageNodes(root: Node): Node[] {
-  const subPackages =
+function subPackagesNode(root: Node): Node | undefined {
+  return (
     findNodeAtLocation(root, [UNI_SUB_PACKAGES_KEY]) ??
-    findNodeAtLocation(root, [UNI_SUB_PACKAGES_COMPAT_KEY]);
+    findNodeAtLocation(root, [UNI_SUB_PACKAGES_COMPAT_KEY])
+  );
+}
+
+function subPackageNodes(root: Node): Node[] {
+  const subPackages = subPackagesNode(root);
 
   if (subPackages?.type !== 'array') {
     return [];
@@ -720,6 +747,15 @@ function validateNoConditionalSubPackageObjects(
   directives: Map<number, ConditionDirective>,
   root: Node,
 ): void {
+  const subPackages = subPackagesNode(root);
+
+  if (
+    subPackages &&
+    conditionsBeforeLine(directives, lineNumberAt(code, subPackages.offset)).length > 0
+  ) {
+    return;
+  }
+
   for (const subPackage of subPackageNodes(root)) {
     if (conditionsBeforeLine(directives, lineNumberAt(code, subPackage.offset)).length > 0) {
       throw new Error('Conditional compilation cannot wrap a subPackage object.');
@@ -785,7 +821,7 @@ export function parseAppConditionPatches(code: string): AppConditionPatch[] {
   );
 
   return collectConditionalMemberPatches(code, directives, root, [], {
-    forbidTopLevel: true,
+    deniedTopLevelKeys: APP_PATCH_DENIED_TOP_LEVEL_KEYS,
     skipRanges: pageRanges,
   });
 }

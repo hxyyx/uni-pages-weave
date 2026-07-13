@@ -116,7 +116,7 @@ export interface AppConditionPatch {
   patch: Record<string, unknown>;
 }
 
-// UPW schemas intentionally keep unknown keys because most uni-app pages.json
+// upw schemas intentionally keep unknown keys because most uni-app pages.json
 // fields are pass-through data owned by uni-app, plugins, or platform targets.
 export interface UpwAppMetaSchema {
   homePath?: string;

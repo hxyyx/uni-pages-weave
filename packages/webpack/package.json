@@ -1,7 +1,7 @@
 {
   "name": "@uni-pages-weave/webpack",
   "version": "0.1.2",
-  "description": "UPW Webpack integration.",
+  "description": "upw Webpack integration.",
   "type": "module",
   "license": "MIT",
   "main": "./dist/index.cjs",

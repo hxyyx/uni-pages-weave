@@ -384,7 +384,7 @@ function subpackageConfigMap(data) {
     subpackages(data).map((subpackage) => {
       const config = withoutKeys(subpackage, ['pages']);
 
-      // UPW canonical subpackages require name; missing uni-app names normalize to root.
+      // upw canonical subpackages require name; missing uni-app names normalize to root.
       if (config.name === undefined) {
         config.name = config.root;
       }

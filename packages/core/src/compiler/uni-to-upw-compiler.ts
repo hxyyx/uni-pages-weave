@@ -122,7 +122,7 @@ export function initUpw(options: InitUpwOptions): InitUpwResult {
   if (existing.length > 0) {
     if (!options.force) {
       throw new Error(
-        `UPW files already exist under ${context.output}: ${formatExistingFiles(context.output, existing)}. ` +
+        `upw files already exist under ${context.output}: ${formatExistingFiles(context.output, existing)}. ` +
           `Run \`${UPW_CLI_NAME} init --force\` to regenerate them.`,
       );
     }

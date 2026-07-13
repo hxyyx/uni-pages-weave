@@ -76,7 +76,7 @@ export function resolveUpwToUniContext(
   const files = collectUpwFiles(sourceDir);
 
   if (files.length === 0) {
-    throw new Error(`No UPW page files found under ${sourceDir}.`);
+    throw new Error(`No upw page files found under ${sourceDir}.`);
   }
 
   return {
@@ -168,7 +168,7 @@ export function watchUniPagesJsonFromUpwSource(
   watcher.on('change', run);
   watcher.on('unlink', run);
   run();
-  logger.info(`Watching UPW files under ${sourceDir}.`);
+  logger.info(`Watching upw files under ${sourceDir}.`);
 
   return watcher;
 }

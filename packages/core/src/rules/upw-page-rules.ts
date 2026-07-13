@@ -159,12 +159,12 @@ function validatePagePatchTargets(meta: UpwMeta | undefined, label: string): voi
 
 function validatePagePatchTargetFields(patch: Record<string, unknown>, fieldPath: string): void {
   if (Object.prototype.hasOwnProperty.call(patch, UPW_META_KEY)) {
-    throw new Error(`${fieldPath}.${UPW_META_KEY} is UPW metadata and cannot be conditionally patched.`);
+    throw new Error(`${fieldPath}.${UPW_META_KEY} is upw metadata and cannot be conditionally patched.`);
   }
 
   if (Object.prototype.hasOwnProperty.call(patch, UNI_PAGE_PATH_KEY)) {
     throw new Error(
-      `${fieldPath}.${UNI_PAGE_PATH_KEY} is a UPW page identity field and cannot be conditionally patched.`,
+      `${fieldPath}.${UNI_PAGE_PATH_KEY} is an upw page identity field and cannot be conditionally patched.`,
     );
   }
 }

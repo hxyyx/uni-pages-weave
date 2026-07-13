@@ -1,5 +1,5 @@
 {
-  "name": "validateUpwAppConfig rejects patching UPW metadata and compile-time subPackages",
+  "name": "validateUpwAppConfig rejects patching upw metadata and compile-time app fields",
   "kind": "validate-upw-app-errors",
   "inputs": [
     {
@@ -16,7 +16,7 @@
           ]
         }
       },
-      "errorPattern": "\\$upw is UPW metadata and cannot be conditionally patched"
+      "errorPattern": "\\$upw is upw metadata and cannot be conditionally patched"
     },
     {
       "config": {
@@ -32,7 +32,39 @@
           ]
         }
       },
-      "errorPattern": "cannot conditionally patch UPW compile-time fields: subPackages"
+      "errorPattern": "subPackages is an upw compile-time structure field and cannot be conditionally patched"
+    },
+    {
+      "config": {
+        "$upw": {
+          "homePath": "pages/index/index",
+          "patches": [
+            {
+              "when": ["h5"],
+              "patch": {
+                "subpackages": []
+              }
+            }
+          ]
+        }
+      },
+      "errorPattern": "subpackages is a uni-app compatibility alias of subPackages and cannot be conditionally patched"
+    },
+    {
+      "config": {
+        "$upw": {
+          "homePath": "pages/index/index",
+          "patches": [
+            {
+              "when": ["h5"],
+              "patch": {
+                "pages": []
+              }
+            }
+          ]
+        }
+      },
+      "errorPattern": "pages is generated from page-level upw files and cannot be conditionally patched"
     }
   ]
 }

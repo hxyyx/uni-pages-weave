@@ -1,0 +1,9 @@
+{
+  // #ifdef H5
+  "pages": [
+    {
+      "path": "pages/index/index"
+    }
+  ]
+  // #endif
+}

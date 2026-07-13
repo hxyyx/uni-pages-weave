@@ -1,0 +1,3 @@
+{
+  "messagePattern": "pages is generated from page-level upw files and cannot be used as an app conditional patch target"
+}

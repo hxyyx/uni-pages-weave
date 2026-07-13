@@ -1,0 +1,28 @@
+{
+  "$upw": {
+    "homePath": "pages/index/index",
+    "patches": [
+      {
+        "when": [
+          "h5"
+        ],
+        "patch": {
+          "globalStyle": {
+            "navigationBarTitleText": "H5"
+          }
+        }
+      },
+      {
+        "when": [
+          "mp-weixin"
+        ],
+        "patch": {
+          "easycom": {
+            "autoscan": true
+          }
+        }
+      }
+    ]
+  },
+  "subPackages": []
+}

@@ -1,0 +1,20 @@
+{
+  // #ifdef H5
+  "globalStyle": {
+    "navigationBarTitleText": "H5"
+  },
+  // #endif
+  // #ifdef MP-WEIXIN
+  "easycom": {
+    "autoscan": true
+  },
+  // #endif
+  "pages": [
+    {
+      "path": "pages/index/index",
+      "style": {
+        "navigationBarTitleText": "Home"
+      }
+    }
+  ]
+}

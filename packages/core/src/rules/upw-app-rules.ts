@@ -11,6 +11,7 @@ import {
 } from '../spec/upw-spec.js';
 import {
   UNI_PAGES_KEY,
+  UNI_SUB_PACKAGES_COMPAT_KEY,
 } from '../spec/uni-pages-spec.js';
 import { isPlainObject } from '../foundation/object.js';
 import {
@@ -103,30 +104,32 @@ function validateAppConditionalPatchTargets(
 function validateAppTopLevelFields(app: Record<string, unknown>, appLabel: string): void {
   if (Object.prototype.hasOwnProperty.call(app, UNI_PAGES_KEY)) {
     throw new Error(
-      `${appLabel}.${UNI_PAGES_KEY} is generated from page-level UPW files and cannot be configured in app.upw.json.`,
+      `${appLabel}.${UNI_PAGES_KEY} is generated from page-level upw files and cannot be configured in app.upw.json.`,
     );
   }
 }
 
+const APP_PATCH_DENIED_TOP_LEVEL_FIELDS = new Map<string, string>([
+  [UPW_META_KEY, `${UPW_META_KEY} is upw metadata and cannot be conditionally patched.`],
+  [
+    UNI_PAGES_KEY,
+    `${UNI_PAGES_KEY} is generated from page-level upw files and cannot be conditionally patched.`,
+  ],
+  [
+    UPW_SUB_PACKAGES_KEY,
+    `${UPW_SUB_PACKAGES_KEY} is an upw compile-time structure field and cannot be conditionally patched.`,
+  ],
+  [
+    UNI_SUB_PACKAGES_COMPAT_KEY,
+    `${UNI_SUB_PACKAGES_COMPAT_KEY} is a uni-app compatibility alias of ${UPW_SUB_PACKAGES_KEY} and cannot be conditionally patched.`,
+  ],
+]);
+
 function validateAppPatchTargetFields(patch: Record<string, unknown>, fieldPath: string): void {
-  if (Object.prototype.hasOwnProperty.call(patch, UPW_META_KEY)) {
-    throw new Error(`${fieldPath}.${UPW_META_KEY} is UPW metadata and cannot be conditionally patched.`);
-  }
-
-  if (Object.prototype.hasOwnProperty.call(patch, UNI_PAGES_KEY)) {
-    throw new Error(
-      `${fieldPath}.${UNI_PAGES_KEY} is generated from page-level UPW files and cannot be conditionally patched.`,
-    );
-  }
-
-  const compileTimeKeys = [UPW_SUB_PACKAGES_KEY].filter((key) =>
-    Object.prototype.hasOwnProperty.call(patch, key),
-  );
-
-  if (compileTimeKeys.length > 0) {
-    throw new Error(
-      `${fieldPath} cannot conditionally patch UPW compile-time fields: ${compileTimeKeys.join(', ')}.`,
-    );
+  for (const [key, reason] of APP_PATCH_DENIED_TOP_LEVEL_FIELDS) {
+    if (Object.prototype.hasOwnProperty.call(patch, key)) {
+      throw new Error(`${fieldPath}.${reason}`);
+    }
   }
 }
 
@@ -146,7 +149,7 @@ function validateSubPackageGeneratedFields(app: Record<string, unknown>, appLabe
 
     if (Object.prototype.hasOwnProperty.call(item, UNI_PAGES_KEY)) {
       throw new Error(
-        `${itemPath}.${UNI_PAGES_KEY} is generated from page-level UPW files and $upw.subPackageName and cannot be configured in app.upw.json.`,
+        `${itemPath}.${UNI_PAGES_KEY} is generated from page-level upw files and $upw.subPackageName and cannot be configured in app.upw.json.`,
       );
     }
   });

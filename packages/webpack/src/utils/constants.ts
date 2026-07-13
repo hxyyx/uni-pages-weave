@@ -1,1 +1,1 @@
-export const UPW_WEBPACK_PLUGIN_NAME = 'UpwWebpackPlugin';
+export const UPW_WEBPACK_PLUGIN_NAME = 'upw:webpack';

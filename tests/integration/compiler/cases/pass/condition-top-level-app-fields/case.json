@@ -1,0 +1,12 @@
+{
+  "name": "condition-top-level-app-fields",
+  "kind": "roundtrip",
+  "input": "input/pages.json",
+  "actual": {
+    "upw": "upw",
+    "pages": "pages.json"
+  },
+  "expected": {
+    "upw": "expected/upw"
+  }
+}

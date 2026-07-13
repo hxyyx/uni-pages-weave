@@ -1,7 +1,7 @@
 {
   "name": "@uni-pages-weave/vite",
   "version": "0.1.2",
-  "description": "UPW Vite integration.",
+  "description": "upw Vite integration.",
   "type": "module",
   "license": "MIT",
   "main": "./dist/index.cjs",

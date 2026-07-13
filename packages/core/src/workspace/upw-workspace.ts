@@ -528,7 +528,7 @@ export function buildUniPagesJsonWorkspaceFromUpwProject(options: {
     const isPlatformPage = isPlatformWorkspaceFile(options.sourceDir, source.file);
     const { page: config, meta } = convertUpwPageFragmentToUniPageEntry(source.data as UpwPageSchema, {
       forbidUpw: isPlatformPage,
-      forbidUpwMessage: `${source.file} cannot define ${UPW_META_KEY} because platform-specific UPW files cannot contain UPW metadata.`,
+      forbidUpwMessage: `${source.file} cannot define ${UPW_META_KEY} because platform-specific upw files cannot contain upw metadata.`,
       label: source.file,
     });
 
