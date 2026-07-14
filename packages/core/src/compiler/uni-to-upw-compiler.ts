@@ -23,11 +23,20 @@ export interface ExtractUpwSourceFromUniPagesJsonContext {
   output: string;
 }
 
+export type GeneratedUpwSourceFileKind = 'app' | 'page' | 'backup';
+
+export interface GeneratedUpwSourceFile {
+  kind: GeneratedUpwSourceFileKind;
+  path: string;
+}
+
 export interface ExtractUpwSourceFromUniPagesJsonResult {
   files: string[];
+  generatedFiles: GeneratedUpwSourceFile[];
 }
 
 interface PendingFile {
+  kind: Exclude<GeneratedUpwSourceFileKind, 'backup'>;
   path: string;
   content: string;
 }
@@ -61,12 +70,15 @@ function runUniToUpw(
   const { input, output } = context;
   const workspace = buildUpwWorkspaceFilesFromUniPagesJson(parsePagesSource(input), output);
   const files: string[] = [];
+  const generatedFiles: GeneratedUpwSourceFile[] = [];
   const pendingFiles: PendingFile[] = [
     {
+      kind: 'app',
       path: workspace.appFile.path,
       content: renderUpwJson(workspace.appFile.config),
     },
     ...workspace.pageFiles.map((file) => ({
+      kind: 'page' as const,
       path: file.path,
       content: renderUpwJson(file.config),
     })),
@@ -76,13 +88,15 @@ function runUniToUpw(
     ensureParentDir(file.path);
     fs.writeFileSync(file.path, file.content, DEFAULT_TEXT_ENCODING);
     files.push(file.path);
+    generatedFiles.push({ kind: file.kind, path: file.path });
   }
 
   const backupFile = backupUniPagesJson(input);
 
   files.push(backupFile);
+  generatedFiles.push({ kind: 'backup', path: backupFile });
 
-  return { files };
+  return { files, generatedFiles };
 }
 
 export function extractUpwSourceFromUniPagesJson(
@@ -134,5 +148,5 @@ export function initUpw(options: InitUpwOptions): InitUpwResult {
     removeExistingUpwFiles(existing);
   }
 
-  return extractUpwSourceFromUniPagesJson(options);
+  return runUniToUpw(context);
 }

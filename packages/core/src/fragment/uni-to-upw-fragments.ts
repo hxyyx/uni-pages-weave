@@ -14,7 +14,6 @@ import {
 import {
   UNI_PAGES_KEY,
   UNI_PAGE_PATH_KEY,
-  UNI_SUB_PACKAGES_COMPAT_KEY,
   UNI_SUB_PACKAGES_KEY,
 } from '../spec/uni-pages-spec.js';
 import { isPlainObject } from '../foundation/object.js';
@@ -60,7 +59,6 @@ export function convertUniAppFragmentToUpwApp(
   const {
     [UNI_PAGES_KEY]: _pages,
     [UNI_SUB_PACKAGES_KEY]: _uniSubPackages,
-    [UNI_SUB_PACKAGES_COMPAT_KEY]: _compatSubPackages,
     [UPW_META_KEY]: _upw,
     ...app
   } = data;

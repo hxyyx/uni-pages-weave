@@ -43,6 +43,34 @@ function assertNoPagesJsonBackup(input) {
   assert.equal(fs.existsSync(backup), false, `${input} backup should not exist.`);
 }
 
+function assertGeneratedFileResult(result, input, upwDir) {
+  assert.deepEqual(
+    result.files,
+    result.generatedFiles.map((file) => file.path),
+    'files should remain a path-only view of generatedFiles.',
+  );
+  assert.equal(
+    result.generatedFiles.some(
+      (file) => file.kind === 'app' && file.path === path.join(upwDir, 'app.upw.json'),
+    ),
+    true,
+    'generatedFiles should include the app upw file.',
+  );
+  assert.equal(
+    result.generatedFiles.some((file) => file.kind === 'page' && file.path.endsWith('.upw.json')),
+    true,
+    'generatedFiles should include page upw files.',
+  );
+  assert.equal(
+    result.generatedFiles.some(
+      (file) =>
+        file.kind === 'backup' && file.path === path.join(path.dirname(input), 'pages.json.bak'),
+    ),
+    true,
+    'generatedFiles should include the pages.json backup.',
+  );
+}
+
 function readExpectedErrorPattern(testCase, caseDir) {
   const expectedError = readJsonc(
     caseFixture(caseDir, testCase.expectedError, `${testCase.name}.expectedError`),
@@ -92,7 +120,11 @@ function runSuccessCase(testCase, caseDir, actualDir) {
 
   readJsonc(input);
   withWorkingDirectory(actualDir, () => {
-    extractUpwSourceFromUniPagesJson({ input, output: upwDir });
+    const result = extractUpwSourceFromUniPagesJson({ input, output: upwDir });
+
+    if (testCase.assertGeneratedFiles === true) {
+      assertGeneratedFileResult(result, input, upwDir);
+    }
   });
   assertPagesJsonBackup(input);
 

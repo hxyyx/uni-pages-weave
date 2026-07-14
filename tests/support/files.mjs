@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { readJsonc } from './jsonc.mjs';
 
 export const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
-export const actualRoot = path.join(repoRoot, '.upw', 'tests');
+export const actualRoot = path.join(repoRoot, 'tmp', 'tests');
 
 export function cleanDir(dir) {
   fs.rmSync(dir, { recursive: true, force: true });

@@ -2,7 +2,7 @@
 
 import fs from 'fs-extra';
 
-import { UPW_TARGET_DIR } from '../spec/upw-spec.js';
+import { UPW_APP_FILE, UPW_TARGET_DIR } from '../spec/upw-spec.js';
 import {
   DEFAULT_PROJECT_DIR,
   UNI_PAGES_JSON_FILE,
@@ -24,6 +24,10 @@ export interface ProjectPaths {
 export interface ResolveUniAppProjectOptions {
   mode?: UniAppProjectMode;
   targetDir?: string;
+}
+
+export interface ResolveUpwProjectOptions {
+  mode?: UniAppProjectMode;
 }
 
 function sourceDir(projectDir: string, layout: UniAppProjectLayout): string {
@@ -59,6 +63,22 @@ function projectFromPagesJson(
     pagesJsonPath,
     layout,
     upwSourceDir: upwSourceDir(projectDir, layout, targetDir),
+  };
+}
+
+function projectFromAppUpw(projectDir: string, layout: UniAppProjectLayout): ProjectPaths {
+  const inputDir = sourceDir(projectDir, layout);
+  const appUpwPath = path.join(inputDir, UPW_APP_FILE);
+
+  if (!fs.existsSync(appUpwPath)) {
+    throw new Error(`No ${UPW_APP_FILE} found at ${appUpwPath}.`);
+  }
+
+  return {
+    projectDir,
+    pagesJsonPath: path.join(inputDir, UNI_PAGES_JSON_FILE),
+    layout,
+    upwSourceDir: inputDir,
   };
 }
 
@@ -105,5 +125,36 @@ export function resolveProjectPaths(
 
   throw new Error(
     `No ${UNI_PAGES_JSON_FILE} found under ${resolvedProjectDir}. Expected ${UNI_PAGES_JSON_FILE} or ${UNI_PROJECT_SRC_DIR}/${UNI_PAGES_JSON_FILE}.`,
+  );
+}
+
+export function resolveUpwProjectPaths(
+  projectDir = DEFAULT_PROJECT_DIR,
+  options: ResolveUpwProjectOptions = {},
+): ProjectPaths {
+  assertProjectMode(options.mode);
+
+  const resolvedProjectDir = path.resolve(projectDir);
+  const srcAppUpw = path.join(resolvedProjectDir, UNI_PROJECT_SRC_DIR, UPW_APP_FILE);
+  const rootAppUpw = path.join(resolvedProjectDir, UPW_APP_FILE);
+
+  if (options.mode === UNI_PROJECT_MODE_CLI) {
+    return projectFromAppUpw(resolvedProjectDir, UNI_PROJECT_SRC_DIR);
+  }
+
+  if (options.mode === UNI_PROJECT_MODE_HBUILDX) {
+    return projectFromAppUpw(resolvedProjectDir, 'root');
+  }
+
+  if (fs.existsSync(srcAppUpw)) {
+    return projectFromAppUpw(resolvedProjectDir, UNI_PROJECT_SRC_DIR);
+  }
+
+  if (fs.existsSync(rootAppUpw)) {
+    return projectFromAppUpw(resolvedProjectDir, 'root');
+  }
+
+  throw new Error(
+    `No ${UPW_APP_FILE} found under ${resolvedProjectDir}. Expected ${UPW_APP_FILE} or ${UNI_PROJECT_SRC_DIR}/${UPW_APP_FILE}.`,
   );
 }

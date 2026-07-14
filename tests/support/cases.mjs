@@ -76,9 +76,11 @@ export function readCases(casesRoot) {
 }
 
 export function actualCaseDir(casesRoot, actualBaseDir, testCase, caseFile) {
-  const group = path.relative(casesRoot, path.dirname(caseFile)).split(path.sep)[0] ?? 'case';
+  const relativeCaseDir = path.relative(casesRoot, path.dirname(caseFile));
+  const group = path.dirname(relativeCaseDir);
+  const caseGroup = group === '.' ? relativeCaseDir || 'case' : group;
 
-  return path.join(actualBaseDir, group, testCase.name);
+  return path.join(actualBaseDir, caseGroup, testCase.name);
 }
 
 export function actualSuiteCaseDir(suiteName, testCase) {

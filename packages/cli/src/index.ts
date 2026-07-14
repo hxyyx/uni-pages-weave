@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 
-import fs from 'node:fs';
 import path from 'node:path';
 
 import { Command } from 'commander';
@@ -9,17 +8,18 @@ import { PACKAGE_VERSION } from './utils/package-info.js';
 
 import {
   buildUniPagesJsonFromUpwSource,
-  extractUpwSourceFromUniPagesJson,
+  initUpw,
   resolveProjectPaths,
+  resolveUpwProjectPaths,
   watchUniPagesJsonFromUpwSource,
+  type GeneratedUpwSourceFile,
 } from '@uni-pages-weave/core';
-import { logger } from '@uni-pages-weave/core/logger';
+import { logColors, logger } from '@uni-pages-weave/core/logger';
 
 const program = new Command();
 
 interface CommandOptions {
   force?: boolean;
-  watch?: boolean;
 }
 
 function resolveCommandPaths(): {
@@ -34,31 +34,44 @@ function resolveCommandPaths(): {
   };
 }
 
-function walkUpwFiles(dir: string): string[] {
-  if (!fs.existsSync(dir)) {
-    return [];
-  }
+function resolveBuildCommandPaths(): {
+  pagesJsonPath: string;
+  upwSourceDir: string;
+} {
+  const project = resolveUpwProjectPaths();
 
-  return fs.readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
-    const filePath = path.join(dir, entry.name);
-
-    if (entry.isDirectory()) {
-      return walkUpwFiles(filePath);
-    }
-
-    return entry.isFile() && entry.name.endsWith('.upw.json') ? [filePath] : [];
-  });
+  return {
+    pagesJsonPath: project.pagesJsonPath,
+    upwSourceDir: project.upwSourceDir,
+  };
 }
 
-function existingUpwFiles(upwSourceDir: string): string[] {
-  const appFile = path.join(upwSourceDir, 'app.upw.json');
-  const files = fs.existsSync(appFile) ? [appFile] : [];
+function relativeDisplayPath(filePath: string): string {
+  const relativePath = path.relative(process.cwd(), filePath) || path.basename(filePath);
 
-  return [
-    ...files,
-    ...walkUpwFiles(path.join(upwSourceDir, 'pages')),
-    ...walkUpwFiles(path.join(upwSourceDir, 'platforms')),
-  ];
+  return relativePath.replace(/\\/gu, '/');
+}
+
+function generatedFileLabel(file: GeneratedUpwSourceFile): string {
+  const label = file.kind.padEnd(6);
+
+  if (file.kind === 'app') {
+    return logColors.green(label);
+  }
+
+  if (file.kind === 'backup') {
+    return logColors.yellow(label);
+  }
+
+  return logColors.cyan(label);
+}
+
+function logGeneratedFiles(files: GeneratedUpwSourceFile[]): void {
+  logger.info(`Generated ${logColors.green(String(files.length))} file(s).`);
+
+  for (const file of files) {
+    console.log(`  ${generatedFileLabel(file)} ${logColors.dim(relativeDisplayPath(file.path))}`);
+  }
 }
 
 program.name(UPW_CLI_NAME).description(UPW_CLI_DESCRIPTION).version(PACKAGE_VERSION);
@@ -69,41 +82,22 @@ program
   .option('-f, --force', 'regenerate upw files when an upw workspace already exists')
   .action((options: CommandOptions) => {
     const { pagesJsonPath, upwSourceDir } = resolveCommandPaths();
-    const existing = existingUpwFiles(upwSourceDir);
 
-    if (existing.length > 0 && !options.force) {
-      throw new Error(
-        `upw files already exist under ${upwSourceDir}. ` +
-          `Run \`${UPW_CLI_NAME} init --force\` to regenerate them.`,
-      );
-    }
-
-    if (existing.length > 0) {
-      existing.forEach((file) => fs.rmSync(file, { force: true }));
-    }
-
-    const result = extractUpwSourceFromUniPagesJson({
+    const result = initUpw({
+      force: options.force,
       input: pagesJsonPath,
       output: upwSourceDir,
     });
 
-    logger.info(`Generated ${result.files.length} file(s).`);
+    logGeneratedFiles(result.generatedFiles);
+    logger.info(`Run \`${UPW_CLI_NAME} watch\` to start watching upw files.`);
   });
 
 program
   .command('build')
   .description(`build ${UNI_PAGES_JSON_FILE} from an upw workspace`)
-  .option('-w, --watch', `watch upw files and rebuild ${UNI_PAGES_JSON_FILE}`)
-  .action((options: CommandOptions) => {
-    const { pagesJsonPath, upwSourceDir } = resolveCommandPaths();
-
-    if (options.watch) {
-      watchUniPagesJsonFromUpwSource({
-        input: upwSourceDir,
-        output: pagesJsonPath,
-      });
-      return;
-    }
+  .action(() => {
+    const { pagesJsonPath, upwSourceDir } = resolveBuildCommandPaths();
 
     const result = buildUniPagesJsonFromUpwSource({
       input: upwSourceDir,
@@ -111,6 +105,18 @@ program
     });
 
     logger.info(`Built ${result.pages.length} page(s).`);
+  });
+
+program
+  .command('watch')
+  .description(`watch upw files and rebuild ${UNI_PAGES_JSON_FILE}`)
+  .action(() => {
+    const { pagesJsonPath, upwSourceDir } = resolveBuildCommandPaths();
+
+    watchUniPagesJsonFromUpwSource({
+      input: upwSourceDir,
+      output: pagesJsonPath,
+    });
   });
 
 try {

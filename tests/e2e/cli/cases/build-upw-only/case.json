@@ -1,0 +1,7 @@
+{
+  "name": "build-upw-only",
+  "kind": "cli-build-only",
+  "fixture": "fixture",
+  "pagesJsonPath": "pages.json",
+  "expectedPagesJson": "expected/pages.json"
+}

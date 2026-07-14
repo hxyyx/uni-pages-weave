@@ -1,7 +1,7 @@
 export const UPW_CLI_NAME = 'upw';
 export const UPW_SUB_PACKAGES_KEY = 'subPackages';
 
-export const UPW_TARGET_DIR = '.upw';
+export const UPW_TARGET_DIR = 'tmp';
 export const UPW_APP_FILE = 'app.upw.json';
 export const UPW_PAGE_EXTENSION = '.upw.json';
 export const UPW_PAGE_FILE_GLOB = '*.upw.json';

@@ -24,10 +24,19 @@ export interface ParsedPagesJson {
 }
 
 function normalizeCompatSubPackages(data: Record<string, unknown>): Record<string, unknown> {
-  if (
-    Object.prototype.hasOwnProperty.call(data, UNI_SUB_PACKAGES_KEY) ||
-    !Object.prototype.hasOwnProperty.call(data, UNI_SUB_PACKAGES_COMPAT_KEY)
-  ) {
+  const hasSubPackages = Object.prototype.hasOwnProperty.call(data, UNI_SUB_PACKAGES_KEY);
+  const hasCompatSubPackages = Object.prototype.hasOwnProperty.call(
+    data,
+    UNI_SUB_PACKAGES_COMPAT_KEY,
+  );
+
+  if (hasSubPackages && hasCompatSubPackages) {
+    throw new Error(
+      `${UNI_SUB_PACKAGES_KEY} and ${UNI_SUB_PACKAGES_COMPAT_KEY} cannot be used together in pages.json.`,
+    );
+  }
+
+  if (hasSubPackages || !hasCompatSubPackages) {
     return data;
   }
 

@@ -6,7 +6,9 @@ export interface FormatLogOptions {
   colors?: boolean;
 }
 
-type LogColors = Pick<typeof pc, 'red' | 'yellow'>;
+export type LogColors = Pick<typeof pc, 'cyan' | 'dim' | 'green' | 'red' | 'yellow'>;
+
+export const logColors: LogColors = pc;
 
 function colors(options: FormatLogOptions = {}): LogColors {
   return options.colors === undefined ? pc : pc.createColors(options.colors);

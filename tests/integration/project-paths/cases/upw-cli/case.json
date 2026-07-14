@@ -1,0 +1,10 @@
+{
+  "name": "upw-cli",
+  "kind": "upw-project-paths",
+  "fixture": "fixture",
+  "expected": {
+    "layout": "src",
+    "pagesJsonPath": "src/pages.json",
+    "upwSourceDir": "src"
+  }
+}

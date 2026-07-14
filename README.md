@@ -37,9 +37,9 @@ npm exec -- upw build
 开发时监听 upw 文件并自动生成 `pages.json`：
 
 ```sh
-npm exec -- upw build --watch
-# yarn upw build --watch
-# pnpm exec upw build --watch
+npm exec -- upw watch
+# yarn upw watch
+# pnpm exec upw watch
 ```
 
 ## CLI
@@ -116,19 +116,15 @@ npm exec -- upw build
 # pnpm exec upw build
 ```
 
+### `watch`
+
 监听 upw 文件并在变化后生成 `pages.json`：
 
 ```sh
-npm exec -- upw build --watch
-# yarn upw build --watch
-# pnpm exec upw build --watch
+npm exec -- upw watch
+# yarn upw watch
+# pnpm exec upw watch
 ```
-
-参数：
-
-| 参数          | 说明                               |
-| ------------- | ---------------------------------- |
-| `-w, --watch` | 监听 upw 文件并生成 `pages.json`。 |
 
 ### 通用参数
 
