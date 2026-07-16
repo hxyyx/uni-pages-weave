@@ -20,4 +20,3 @@ export function validatePageSourcePath(
     throw new Error(`${filePath} does not match page path "${pagePath}". Expected ${expected}.`);
   }
 }
-

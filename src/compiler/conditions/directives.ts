@@ -38,10 +38,7 @@ export function conditionGroupKey(conditions: ConditionNode[]): string {
     .join('&&');
 }
 
-export function isConditionPrefix(
-  conditions: ConditionNode[],
-  target: ConditionNode[],
-): boolean {
+export function isConditionPrefix(conditions: ConditionNode[], target: ConditionNode[]): boolean {
   return (
     conditions.length <= target.length &&
     conditions.every((condition, index) => sameCondition(condition, target[index]))

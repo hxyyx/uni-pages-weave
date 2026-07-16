@@ -19,10 +19,7 @@ import {
   type ConditionDirective,
   type ConditionsForLine,
 } from './directives.js';
-import {
-  stripConditionalSections,
-  stripConditionalSectionsForConditions,
-} from './strip.js';
+import { stripConditionalSections, stripConditionalSectionsForConditions } from './strip.js';
 
 export type JsoncNode = Node;
 export type ParseNodeValue = (node: Node) => unknown | undefined;

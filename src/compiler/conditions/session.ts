@@ -4,11 +4,7 @@ import type {
   ConditionNode,
   PageConditionPatch,
 } from '../../schemas/upw.js';
-import {
-  conditionDirectives,
-  conditionGroupKey,
-  type ConditionDirective,
-} from './directives.js';
+import { conditionDirectives, conditionGroupKey, type ConditionDirective } from './directives.js';
 import { LineConditionIndex } from './line-index.js';
 import {
   NodeValueParserCache,
@@ -23,10 +19,7 @@ import {
   stripConditionalSectionsWithDirectives,
 } from './strip.js';
 import { collectConditionBlocks } from './blocks.js';
-import {
-  collectAppConditionPatches,
-  collectPageConditionPatches,
-} from './patches.js';
+import { collectAppConditionPatches, collectPageConditionPatches } from './patches.js';
 
 class PagesJsonParseSession {
   private readonly conditionIndex: LineConditionIndex;

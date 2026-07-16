@@ -1,6 +1,6 @@
 {
   "name": "uni-pages-weave",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "upw pages.json compiler toolkit.",
   "type": "module",
   "license": "MIT",

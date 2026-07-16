@@ -13,11 +13,7 @@ import {
   type ConditionDirective,
   type ConditionsForLine,
 } from './directives.js';
-import {
-  nodeStringValue,
-  propertyValueNode,
-  subPackageNodes,
-} from './ast.js';
+import { nodeStringValue, propertyValueNode, subPackageNodes } from './ast.js';
 import { stripConditionalSections } from './strip.js';
 
 function parsePageObject(source: string): Record<string, unknown> | undefined {

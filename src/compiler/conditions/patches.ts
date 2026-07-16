@@ -1,8 +1,4 @@
-import type {
-  AppConditionPatch,
-  ConditionNode,
-  PageConditionPatch,
-} from '../../schemas/upw.js';
+import type { AppConditionPatch, ConditionNode, PageConditionPatch } from '../../schemas/upw.js';
 import {
   UNI_PAGES_KEY,
   UNI_PAGE_PATH_KEY,
@@ -267,8 +263,9 @@ export function collectPageConditionPatches(options: {
       return [];
     }
 
-    const baseConditionCount = options.conditionsForLine(lineNumberAt(options.source, node.offset))
-      .length;
+    const baseConditionCount = options.conditionsForLine(
+      lineNumberAt(options.source, node.offset),
+    ).length;
 
     return collectConditionalMemberPatches(options.source, options.directives, node, [], {
       baseConditionCount,
