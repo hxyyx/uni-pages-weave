@@ -2,14 +2,14 @@
 
 import fs from 'fs-extra';
 
-import { UPW_APP_FILE, UPW_TARGET_DIR } from '../spec/upw-spec.js';
+import { UPW_APP_FILE, UPW_TARGET_DIR } from '../schemas/upw.js';
 import {
   DEFAULT_PROJECT_DIR,
   UNI_PAGES_JSON_FILE,
   UNI_PROJECT_MODE_CLI,
   UNI_PROJECT_MODE_HBUILDX,
   UNI_PROJECT_SRC_DIR,
-} from '../spec/uni-pages-spec.js';
+} from '../schemas/uni-pages.js';
 
 export type UniAppProjectLayout = 'root' | typeof UNI_PROJECT_SRC_DIR;
 export type UniAppProjectMode = typeof UNI_PROJECT_MODE_HBUILDX | typeof UNI_PROJECT_MODE_CLI;

@@ -1,20 +1,20 @@
-import type { ConditionalPatch, UpwMeta } from '../spec/upw-spec.js';
-import type { UpwPageSchema } from '../spec/upw-spec.js';
+import type { ConditionalPatch, UpwMeta } from '../schemas/upw.js';
+import type { UpwPageSchema } from '../schemas/upw.js';
 import {
   UPW_META_ALLOWED_KEYS,
   UPW_META_KEY,
   UPW_META_PATCH_KEY,
   UPW_META_PATCHES_KEY,
   UPW_META_SUB_PACKAGE_NAME_KEY,
-} from '../spec/upw-spec.js';
-import { UNI_PAGE_PATH_KEY } from '../spec/uni-pages-spec.js';
-import { isPlainObject } from '../foundation/object.js';
+} from '../schemas/upw.js';
+import { UNI_PAGE_PATH_KEY } from '../schemas/uni-pages.js';
+import { isPlainObject } from '../utils/object.js';
 import {
   assertAllowedKeys,
   normalizeConditionMetaFields,
   normalizeConditionalPatch,
   validateConditionalPatchShape,
-} from './upw-meta-rules.js';
+} from './upw-meta.js';
 
 export interface ValidateUpwPageConfigOptions {
   forbidUpw?: boolean;

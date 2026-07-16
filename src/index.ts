@@ -1,17 +1,17 @@
-﻿export {
+export {
   buildUniPagesJsonFromUpwSource,
   resolveUpwBuildContext,
   watchUniPagesJsonFromUpwSource,
-} from './compiler/upw-to-uni-compiler.js';
-export { extractUpwSourceFromUniPagesJson, initUpw } from './compiler/uni-to-upw-compiler.js';
-export { renderUpwToUniPagesJson } from './renderer/uni-pages-json-renderer.js';
-export { resolveProjectPaths, resolveUpwProjectPaths } from './workspace/uni-project-paths.js';
+} from './compiler/upw-to-uni.js';
+export { extractUpwSourceFromUniPagesJson, initUpw } from './compiler/uni-to-upw.js';
+export { renderUpwToUniPagesJson } from './compiler/generate/generate-pages-json.js';
+export { resolveProjectPaths, resolveUpwProjectPaths } from './config/paths.js';
 export type {
   BuildUniPagesJsonFromUpwSourceOptions,
   BuildUniPagesJsonFromUpwSourceResult,
   UpwBuildContext,
   WatchUniPagesJsonFromUpwSourceOptions,
-} from './compiler/upw-to-uni-compiler.js';
+} from './compiler/upw-to-uni.js';
 export type {
   ExtractUpwSourceFromUniPagesJsonOptions,
   ExtractUpwSourceFromUniPagesJsonResult,
@@ -19,13 +19,13 @@ export type {
   GeneratedUpwSourceFileKind,
   InitUpwOptions,
   InitUpwResult,
-} from './compiler/uni-to-upw-compiler.js';
+} from './compiler/uni-to-upw.js';
 export type {
   RenderUpwToUniPagesJsonInput,
   RenderUpwWorkspaceData,
-} from './renderer/uni-pages-json-renderer.js';
+} from './compiler/generate/generate-pages-json.js';
 export type {
   ProjectPaths,
   ResolveUpwProjectOptions,
   UniAppProjectMode,
-} from './workspace/uni-project-paths.js';
+} from './config/paths.js';

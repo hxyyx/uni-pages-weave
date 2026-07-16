@@ -5,12 +5,10 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import fs from 'node:fs';
 
 const currentDir = dirname(fileURLToPath(import.meta.url));
-const entry = resolve(currentDir, '../dist/index.js');
+const entry = resolve(currentDir, '../dist/cli/index.js');
 
 if (!fs.existsSync(entry)) {
-  console.error(
-    'upw CLI has not been built yet. Run `pnpm --filter @uni-pages-weave/cli build` first.',
-  );
+  console.error('upw CLI has not been built yet. Run `pnpm run build` first.');
   process.exit(1);
 }
 

@@ -6,7 +6,6 @@ export const UNI_PROJECT_MODE_CLI = 'cli';
 export const UNI_PROJECT_MODE_HBUILDX = 'hbuildx';
 
 export const UNI_PAGES_JSON_FILE = 'pages.json';
-export const UNI_PAGES_JSON_BACKUP_FILE = 'pages.json.bak';
 export const UNI_PAGES_KEY = 'pages';
 
 // uni-app commonly uses subPackages, but older inputs may use subpackages.

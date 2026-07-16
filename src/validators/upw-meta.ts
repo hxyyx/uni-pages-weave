@@ -5,7 +5,7 @@ import type {
   ConditionMeta,
   ConditionalChildPatch,
   ConditionalPatch,
-} from '../spec/upw-spec.js';
+} from '../schemas/upw.js';
 import {
   UPW_CONDITIONAL_CHILD_PATCH_ALLOWED_KEYS,
   UPW_CONDITIONAL_PATCH_ALLOWED_KEYS,
@@ -14,9 +14,9 @@ import {
   UPW_META_PATCH_KEY,
   UPW_META_UNLESS_KEY,
   UPW_META_WHEN_KEY,
-} from '../spec/upw-spec.js';
-import { isPlainObject } from '../foundation/object.js';
-import { normalizePlatformEnv } from '../condition/condition-platform.js';
+} from '../schemas/upw.js';
+import { isPlainObject } from '../utils/object.js';
+import { normalizePlatformEnv } from '../conditions/platform.js';
 
 export function assertAllowedKeys(
   value: Record<string, unknown>,

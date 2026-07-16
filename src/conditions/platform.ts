@@ -1,7 +1,7 @@
 ﻿import uniq from 'lodash-es/uniq.js';
 
-import type { ConditionLayer, ConditionMeta, PlatformCondition } from '../spec/upw-spec.js';
-import { UPW_IFDEF_DIRECTIVE, UPW_IFNDEF_DIRECTIVE } from '../spec/upw-spec.js';
+import type { ConditionLayer, ConditionMeta, PlatformCondition } from '../schemas/upw.js';
+import { UPW_IFDEF_DIRECTIVE, UPW_IFNDEF_DIRECTIVE } from '../schemas/upw.js';
 
 export type ConditionalMeta = ConditionMeta;
 
