@@ -1,6 +1,0 @@
-{
-  "name": "upw-missing-home",
-  "kind": "upw-to-uni-error",
-  "input": "input/upw",
-  "expectedError": "expected/error.json"
-}

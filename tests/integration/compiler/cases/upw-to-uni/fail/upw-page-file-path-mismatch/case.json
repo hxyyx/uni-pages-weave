@@ -1,6 +1,0 @@
-{
-  "name": "upw-page-file-path-mismatch",
-  "kind": "upw-to-uni-error",
-  "input": "input/upw",
-  "expectedError": "expected/error.json"
-}

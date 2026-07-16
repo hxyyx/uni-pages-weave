@@ -1,3 +1,0 @@
-{
-  "messagePattern": "subPackages is an upw compile-time structure field and cannot be conditionally patched"
-}

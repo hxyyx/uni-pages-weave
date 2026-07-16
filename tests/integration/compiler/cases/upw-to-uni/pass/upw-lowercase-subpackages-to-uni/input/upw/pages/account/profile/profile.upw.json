@@ -1,9 +1,0 @@
-{
-  "$upw": {
-    "subPackageName": "account"
-  },
-  "path": "pages/account/profile/profile",
-  "style": {
-    "navigationBarTitleText": "Profile"
-  }
-}

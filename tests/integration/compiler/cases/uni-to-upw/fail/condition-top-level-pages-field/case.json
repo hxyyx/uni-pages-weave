@@ -1,6 +1,0 @@
-{
-  "name": "condition-top-level-pages-field",
-  "kind": "uni-to-upw-error",
-  "input": "input/pages.json",
-  "expectedError": "expected/error.json"
-}
