@@ -42,5 +42,7 @@ tmp/
 temp/
 *.tmp
 
-# UPW local output
-.upw/
+# AI
+.codex/
+.agents/
+skills-lock.json

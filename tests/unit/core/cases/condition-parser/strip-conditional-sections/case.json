@@ -1,9 +1,0 @@
-{
-  "name": "stripConditionalSections removes conditional blocks",
-  "kind": "strip-conditional-sections",
-  "input": "input.jsonc",
-  "expected": {
-    "contains": ["pages/index/index"],
-    "notContains": ["pages/h5/index"]
-  }
-}

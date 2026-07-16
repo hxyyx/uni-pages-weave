@@ -4,16 +4,10 @@ import { input, select } from '@inquirer/prompts';
 import fs from 'fs-extra';
 
 const NPM_REGISTRY = 'https://registry.npmjs.org/';
-const PACKAGE_SCOPE = '@uni-pages-weave/';
+const PACKAGE_NAME = 'uni-pages-weave';
 const ROOT_MANIFEST = path.resolve('package.json');
 const CHANGELOG = path.resolve('CHANGELOG.md');
 const STABLE_SEMVER = /^(\d+)\.(\d+)\.(\d+)$/;
-const DEPENDENCY_FIELDS = [
-  'dependencies',
-  'devDependencies',
-  'peerDependencies',
-  'optionalDependencies',
-];
 
 function readJson(filePath) {
   return JSON.parse(fs.readFileSync(filePath, 'utf8'));
@@ -38,66 +32,40 @@ function run(command, args) {
   }
 }
 
-function relativePath(filePath) {
-  return path.relative(process.cwd(), filePath) || '.';
-}
+function assertRootPackageConfig(manifest) {
+  const errors = [];
 
-function workspacePackages() {
-  const packagesDir = path.resolve('packages');
-
-  if (!fs.existsSync(packagesDir)) {
-    return [];
+  if (manifest.name !== PACKAGE_NAME) {
+    errors.push(`package name must be ${PACKAGE_NAME}`);
   }
 
-  return fs
-    .readdirSync(packagesDir, { withFileTypes: true })
-    .filter((entry) => entry.isDirectory())
-    .map((entry) => {
-      const dir = path.join(packagesDir, entry.name);
-      const manifestPath = path.join(dir, 'package.json');
-
-      if (!fs.existsSync(manifestPath)) {
-        return null;
-      }
-
-      return {
-        dir,
-        manifestPath,
-        manifest: readJson(manifestPath),
-      };
-    })
-    .filter(Boolean)
-    .sort((left, right) => left.manifest.name.localeCompare(right.manifest.name));
-}
-
-function assertPublishablePackageConfig(packages) {
-  const invalidPackages = [];
-
-  for (const item of packages) {
-    const { manifest } = item;
-
-    if (!manifest.name?.startsWith(PACKAGE_SCOPE)) {
-      invalidPackages.push(`${manifest.name ?? item.dir}: name must start with ${PACKAGE_SCOPE}`);
-    }
-
-    if (manifest.publishConfig?.registry !== NPM_REGISTRY) {
-      invalidPackages.push(`${manifest.name}: publishConfig.registry must be ${NPM_REGISTRY}`);
-    }
-
-    if (manifest.publishConfig?.access !== 'public') {
-      invalidPackages.push(`${manifest.name}: publishConfig.access must be public`);
-    }
+  if (manifest.private === true) {
+    errors.push('package must be publishable');
   }
 
-  if (invalidPackages.length > 0) {
-    console.error('Publishable package configuration is invalid.');
-
-    for (const message of invalidPackages) {
-      console.error(`- ${message}`);
-    }
-
-    throw new Error('Publishable package configuration is invalid.');
+  if (manifest.bin?.upw !== './bin/index.js') {
+    errors.push('bin.upw must be ./bin/index.js');
   }
+
+  if (manifest.publishConfig?.registry !== NPM_REGISTRY) {
+    errors.push(`publishConfig.registry must be ${NPM_REGISTRY}`);
+  }
+
+  if (manifest.publishConfig?.access !== 'public') {
+    errors.push('publishConfig.access must be public');
+  }
+
+  if (errors.length === 0) {
+    return;
+  }
+
+  console.error('Root package configuration is invalid.');
+
+  for (const error of errors) {
+    console.error(`- ${error}`);
+  }
+
+  throw new Error('Root package configuration is invalid.');
 }
 
 function assertNpmAuth() {
@@ -113,8 +81,7 @@ function assertNpmAuth() {
   }
 
   console.error('No npm authentication found for the npm registry.');
-  console.error('Configure npm auth with a global granular access token.');
-  console.error('The token must have publish permission and Bypass 2FA enabled.');
+  console.error('Configure npm auth with a token that can publish this package.');
   throw new Error('npm authentication is required before release.');
 }
 
@@ -138,39 +105,6 @@ function bumpVersion(version, bump) {
   }
 
   return `${major}.${minor}.${patch + 1}`;
-}
-
-function syncInternalDependencies(manifest, internalPackageNames, version) {
-  for (const field of DEPENDENCY_FIELDS) {
-    const dependencies = manifest[field];
-
-    if (!dependencies || typeof dependencies !== 'object') {
-      continue;
-    }
-
-    for (const packageName of internalPackageNames) {
-      const current = dependencies[packageName];
-
-      if (typeof current !== 'string' || current.startsWith('workspace:')) {
-        continue;
-      }
-
-      dependencies[packageName] = version;
-    }
-  }
-}
-
-function syncVersions(rootManifest, packages, version) {
-  const internalPackageNames = new Set(packages.map((item) => item.manifest.name));
-
-  rootManifest.version = version;
-  writeJson(ROOT_MANIFEST, rootManifest);
-
-  for (const item of packages) {
-    item.manifest.version = version;
-    syncInternalDependencies(item.manifest, internalPackageNames, version);
-    writeJson(item.manifestPath, item.manifest);
-  }
 }
 
 function packageVersionExists(packageName, version) {
@@ -199,130 +133,20 @@ function packageVersionExists(packageName, version) {
   throw new Error(`Could not check ${packageName}@${version} on npm registry.`);
 }
 
-function assertVersionIsUnpublished(packages, version) {
-  const existingPackages = packages.filter((item) =>
-    packageVersionExists(item.manifest.name, version),
-  );
-
-  if (existingPackages.length === 0) {
+function assertVersionIsUnpublished(packageName, version) {
+  if (!packageVersionExists(packageName, version)) {
     return;
   }
 
-  console.error(`Version ${version} already exists on npm for:`);
-
-  for (const item of existingPackages) {
-    console.error(`- ${item.manifest.name}`);
-  }
-
-  throw new Error(`Version ${version} already exists on npm.`);
+  throw new Error(`${packageName}@${version} already exists on npm.`);
 }
 
-function manifestExportPaths(exportsValue) {
-  if (typeof exportsValue === 'string') {
-    return [exportsValue];
-  }
-
-  if (!exportsValue || typeof exportsValue !== 'object') {
-    return [];
-  }
-
-  return Object.values(exportsValue).flatMap((value) => manifestExportPaths(value));
+function snapshotManifest() {
+  return fs.readFileSync(ROOT_MANIFEST, 'utf8');
 }
 
-function manifestBinPaths(binValue) {
-  if (typeof binValue === 'string') {
-    return [binValue];
-  }
-
-  if (!binValue || typeof binValue !== 'object') {
-    return [];
-  }
-
-  return Object.values(binValue).filter((value) => typeof value === 'string');
-}
-
-function packageEntryPaths(manifest) {
-  return Array.from(
-    new Set(
-      [
-        manifest.main,
-        manifest.module,
-        manifest.types,
-        ...manifestExportPaths(manifest.exports),
-        ...manifestBinPaths(manifest.bin),
-      ].filter((entry) => typeof entry === 'string' && entry.startsWith('./')),
-    ),
-  );
-}
-
-function assertPackageEntryFiles(packages) {
-  const missing = [];
-
-  for (const item of packages) {
-    for (const entryPath of packageEntryPaths(item.manifest)) {
-      const filePath = path.resolve(item.dir, entryPath);
-
-      if (!fs.existsSync(filePath)) {
-        missing.push(`${item.manifest.name}: ${entryPath}`);
-      }
-    }
-  }
-
-  if (missing.length === 0) {
-    console.log('Package entry files exist.');
-    return;
-  }
-
-  console.error('Package entry files are missing.');
-
-  for (const item of missing) {
-    console.error(`- ${item}`);
-  }
-
-  throw new Error('Package entry files are missing.');
-}
-
-function snapshotManifestFiles(packages) {
-  const files = Array.from(new Set([ROOT_MANIFEST, ...packages.map((item) => item.manifestPath)]));
-
-  return files.map((filePath) => ({
-    filePath,
-    content: fs.readFileSync(filePath, 'utf8'),
-  }));
-}
-
-function restoreManifestFiles(snapshot) {
-  for (const item of snapshot) {
-    fs.writeFileSync(item.filePath, item.content);
-  }
-}
-
-function smokeTestCli(packages) {
-  const cliPackage = packages.find((item) => item.manifest.bin?.upw);
-
-  if (!cliPackage) {
-    return;
-  }
-
-  const binPath = path.resolve(cliPackage.dir, cliPackage.manifest.bin.upw);
-
-  console.log(`Smoke testing CLI ${relativePath(binPath)} --version...`);
-  run('node', [binPath, '--version']);
-
-  console.log(`Smoke testing CLI ${relativePath(binPath)} --help...`);
-  run('node', [binPath, '--help']);
-}
-
-function smokeTestReleaseArtifacts(packages) {
-  assertPackageEntryFiles(packages);
-  smokeTestCli(packages);
-}
-
-function packDryRun(packages) {
-  for (const item of packages) {
-    console.log(`Dry-run packing ${item.manifest.name}...`);
-    run('pnpm', ['--dir', item.dir, 'pack', '--dry-run']);
-  }
+function restoreManifest(snapshot) {
+  fs.writeFileSync(ROOT_MANIFEST, snapshot);
 }
 
 function releaseNotePath(version) {
@@ -386,57 +210,39 @@ function updateChangelog(version, releaseNotes) {
   fs.writeFileSync(CHANGELOG, next);
 }
 
-function publishPackages(packages) {
-  for (const item of packages) {
-    console.log(`Publishing ${item.manifest.name}@${item.manifest.version}...`);
-    run('pnpm', [
-      '--dir',
-      item.dir,
-      'publish',
-      '--access',
-      'public',
-      '--registry',
-      NPM_REGISTRY,
-      '--no-git-checks',
-    ]);
-  }
+function publishRootPackage() {
+  run('pnpm', ['publish', '--access', 'public', '--registry', NPM_REGISTRY, '--no-git-checks']);
 }
 
 async function main() {
-  const rootManifest = readJson(ROOT_MANIFEST);
-  const allPackages = workspacePackages();
-  const publishablePackages = allPackages.filter((item) => !item.manifest.private);
+  const manifest = readJson(ROOT_MANIFEST);
 
-  if (publishablePackages.length === 0) {
-    throw new Error('No publishable packages found under packages/.');
-  }
-
-  assertPublishablePackageConfig(publishablePackages);
+  assertRootPackageConfig(manifest);
 
   console.log('Running release preflight checks...');
   run('pnpm', ['run', 'format:check']);
   run('pnpm', ['run', 'verify']);
-  run('pnpm', ['run', 'version:check']);
 
   const bump = await select({
-    message: `Select release type from ${rootManifest.version}`,
+    message: `Select release type from ${manifest.version}`,
     choices: [
       { name: 'patch', value: 'patch', description: 'Bug fixes and small changes' },
       { name: 'minor', value: 'minor', description: 'Backward-compatible features' },
       { name: 'major', value: 'major', description: 'Breaking changes' },
     ],
   });
-  const nextVersion = bumpVersion(rootManifest.version, bump);
+  const nextVersion = bumpVersion(manifest.version, bump);
 
   assertNpmAuth();
-  assertVersionIsUnpublished(publishablePackages, nextVersion);
+  assertVersionIsUnpublished(PACKAGE_NAME, nextVersion);
 
-  const manifestSnapshot = snapshotManifestFiles(publishablePackages);
+  const manifestSnapshot = snapshotManifest();
   let publishStarted = false;
 
   try {
-    console.log(`Preparing release ${nextVersion}.`);
-    syncVersions(rootManifest, publishablePackages, nextVersion);
+    console.log(`Preparing release ${PACKAGE_NAME}@${nextVersion}.`);
+    manifest.version = nextVersion;
+    writeJson(ROOT_MANIFEST, manifest);
 
     const notePath = createReleaseNote(nextVersion);
     console.log(`Release notes file: ${path.relative(process.cwd(), notePath)}`);
@@ -445,12 +251,12 @@ async function main() {
     });
 
     run('pnpm', ['run', 'build']);
-    run('pnpm', ['run', 'version:check']);
-    smokeTestReleaseArtifacts(publishablePackages);
-    packDryRun(publishablePackages);
+    run('pnpm', ['run', 'package:check']);
+    run('pnpm', ['run', 'smoke:cli']);
+    run('pnpm', ['run', 'pack:dry']);
 
     publishStarted = true;
-    publishPackages(publishablePackages);
+    publishRootPackage();
 
     const releaseNotes = readReleaseNoteBody(notePath);
     updateChangelog(nextVersion, releaseNotes);
@@ -462,11 +268,11 @@ async function main() {
       console.log('Release notes were empty. CHANGELOG.md was not updated.');
     }
 
-    console.log(`Release ${nextVersion} completed.`);
+    console.log(`Release ${PACKAGE_NAME}@${nextVersion} completed.`);
   } catch (error) {
     if (!publishStarted) {
-      restoreManifestFiles(manifestSnapshot);
-      console.error('Release failed before publishing. Restored package manifest versions.');
+      restoreManifest(manifestSnapshot);
+      console.error('Release failed before publishing. Restored package manifest version.');
       console.error('Release notes were kept for reuse if they were already created.');
     }
 

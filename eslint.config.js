@@ -2,7 +2,7 @@ import js from '@eslint/js';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
-const sourceFiles = ['packages/*/src/**/*.{js,mjs,ts}', 'src/**/*.{js,mjs,ts}'];
+const sourceFiles = ['src/**/*.{js,mjs,ts}', 'scripts/**/*.mjs'];
 
 export default tseslint.config(
   {
