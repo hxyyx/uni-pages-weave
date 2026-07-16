@@ -1,9 +1,0 @@
-{
-  "$upw": {
-    "homePath": "pages/index/index"
-  },
-  "globalStyle": {
-    "navigationBarTitleText": "Demo"
-  },
-  "subPackages": []
-}
