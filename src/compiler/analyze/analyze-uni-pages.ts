@@ -51,9 +51,9 @@ function externalConditionMeta(
   return conditionsToUpwMeta(conditions);
 }
 
-function appPatchesForConfig(patches: ParsedUniPagesJson['appConditionPatches']): NonNullable<
-  UpwMeta['patches']
-> {
+function appPatchesForConfig(
+  patches: ParsedUniPagesJson['appConditionPatches'],
+): NonNullable<UpwMeta['patches']> {
   return conditionPatchesToUpwPatches(patches);
 }
 
@@ -194,9 +194,7 @@ export function pagePatchesForPath(
   return patchesForPage(patches, subPackages, path);
 }
 
-export function mergeUniPageUpwMeta(
-  ...items: Array<UpwMeta | undefined>
-): UpwMeta | undefined {
+export function mergeUniPageUpwMeta(...items: Array<UpwMeta | undefined>): UpwMeta | undefined {
   return mergeUpwMeta(...items);
 }
 

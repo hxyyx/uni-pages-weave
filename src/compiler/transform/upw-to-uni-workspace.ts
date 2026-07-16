@@ -10,10 +10,7 @@ import type {
   UniPagesJsonRenderWorkspace,
   UpwProjectPageSource,
 } from '../types.js';
-import {
-  isPlatformWorkspaceFile,
-  pagePathToWorkspaceFile,
-} from '../utils/workspace-paths.js';
+import { isPlatformWorkspaceFile, pagePathToWorkspaceFile } from '../utils/workspace-paths.js';
 import { convertUpwPageFragmentToUniPageEntry } from '../utils/upw-page-fragments.js';
 import {
   readSubPackages,

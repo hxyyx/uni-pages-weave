@@ -32,10 +32,7 @@ function pagePath(value: unknown): string | undefined {
     : undefined;
 }
 
-export function composeUpwWorkspace(
-  analysis: UniPagesAnalysis,
-  output: string,
-): UpwWorkspaceFiles {
+export function composeUpwWorkspace(analysis: UniPagesAnalysis, output: string): UpwWorkspaceFiles {
   assertUnconditionalMainHomePage(analysis.data);
 
   const appFile = {

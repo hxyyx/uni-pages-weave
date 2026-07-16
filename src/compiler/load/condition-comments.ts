@@ -42,10 +42,7 @@ export interface ConditionDirective {
 
 type ConditionsForLine = (lineNumber: number) => ConditionNode[];
 type ParseNodeValue = (node: Node) => unknown | undefined;
-type ParseNodeValueForConditions = (
-  node: Node,
-  conditions: ConditionNode[],
-) => unknown | undefined;
+type ParseNodeValueForConditions = (node: Node, conditions: ConditionNode[]) => unknown | undefined;
 
 const CACHED_UNDEFINED = Symbol('cached undefined parse result');
 
@@ -979,10 +976,7 @@ function validateNoConditionalSubPackageObjects(
 ): void {
   const subPackages = subPackagesNode(root);
 
-  if (
-    subPackages &&
-    conditionsForLine(lineNumberAt(code, subPackages.offset)).length > 0
-  ) {
+  if (subPackages && conditionsForLine(lineNumberAt(code, subPackages.offset)).length > 0) {
     return;
   }
 

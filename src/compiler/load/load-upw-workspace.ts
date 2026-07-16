@@ -5,11 +5,7 @@ import { UPW_APP_FILE } from '../../schemas/upw.js';
 import { DEFAULT_TEXT_ENCODING } from '../../schemas/uni-pages.js';
 import { isPlainObject } from '../../utils/object.js';
 import { parseJsoncFragment } from '../utils/jsonc-fragment.js';
-import {
-  appUpwFile,
-  collectUpwFiles,
-  upwWatchPatterns,
-} from '../utils/workspace-paths.js';
+import { appUpwFile, collectUpwFiles, upwWatchPatterns } from '../utils/workspace-paths.js';
 
 export interface BuildUniPagesJsonFromUpwSourceOptions {
   input: string;

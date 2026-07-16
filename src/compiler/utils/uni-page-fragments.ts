@@ -11,11 +11,7 @@ import {
   UPW_META_SUB_PACKAGE_NAME_KEY,
   UPW_SUB_PACKAGES_KEY,
 } from '../../schemas/upw.js';
-import {
-  UNI_PAGES_KEY,
-  UNI_PAGE_PATH_KEY,
-  UNI_SUB_PACKAGES_KEY,
-} from '../../schemas/uni-pages.js';
+import { UNI_PAGES_KEY, UNI_PAGE_PATH_KEY, UNI_SUB_PACKAGES_KEY } from '../../schemas/uni-pages.js';
 import { isPlainObject } from '../../utils/object.js';
 
 interface UniToUpwSubPackageFragment extends Record<string, unknown> {

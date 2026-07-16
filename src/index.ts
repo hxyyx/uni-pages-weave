@@ -24,8 +24,4 @@ export type {
   RenderUpwToUniPagesJsonInput,
   RenderUpwWorkspaceData,
 } from './compiler/generate/generate-pages-json.js';
-export type {
-  ProjectPaths,
-  ResolveUpwProjectOptions,
-  UniAppProjectMode,
-} from './config/paths.js';
+export type { ProjectPaths, ResolveUpwProjectOptions, UniAppProjectMode } from './config/paths.js';
