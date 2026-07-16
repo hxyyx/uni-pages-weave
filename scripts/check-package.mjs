@@ -79,7 +79,11 @@ function assertManifestShape(manifest, messages) {
     `publishConfig.registry must be ${EXPECTED_REGISTRY}`,
     messages,
   );
-  assert(manifest.publishConfig?.access === 'public', 'publishConfig.access must be public', messages);
+  assert(
+    manifest.publishConfig?.access === 'public',
+    'publishConfig.access must be public',
+    messages,
+  );
 
   for (const file of REQUIRED_FILES) {
     assert(
@@ -123,7 +127,11 @@ function assertPnpmWorkspaceSettingsOnly(messages) {
   }
 
   const content = fs.readFileSync(workspaceFile, 'utf8');
-  assert(!/^packages\s*:/m.test(content), 'pnpm-workspace.yaml must not declare package globs', messages);
+  assert(
+    !/^packages\s*:/m.test(content),
+    'pnpm-workspace.yaml must not declare package globs',
+    messages,
+  );
 }
 
 const manifest = readJson(ROOT_MANIFEST);
