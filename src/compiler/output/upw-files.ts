@@ -4,7 +4,7 @@ import fs from 'fs-extra';
 
 import { DEFAULT_TEXT_ENCODING } from '../../schemas/uni-pages.js';
 import type { GeneratedUpwSourceFile, PlannedUpwSourceFile, UpwWorkspaceFiles } from '../types.js';
-import { renderUpwJson } from '../generate/generate-upw-json.js';
+import { renderUpwJson } from '../generate/upw-json.js';
 import { appUpwFile, collectUpwFiles, ensureParentDir } from '../utils/workspace-paths.js';
 import type { ExtractUpwSourceFromUniPagesJsonResult } from '../uni-to-upw.js';
 

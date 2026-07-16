@@ -10,7 +10,7 @@ import {
   existingUpwFiles,
   formatExistingFiles,
   planUniToUpwFiles,
-} from './output/output-upw-workspace.js';
+} from './output/upw-files.js';
 
 export interface ExtractUpwSourceFromUniPagesJsonOptions {
   input: string;

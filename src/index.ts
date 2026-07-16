@@ -4,7 +4,7 @@ export {
   watchUniPagesJsonFromUpwSource,
 } from './compiler/upw-to-uni.js';
 export { extractUpwSourceFromUniPagesJson, initUpw } from './compiler/uni-to-upw.js';
-export { renderUpwToUniPagesJson } from './compiler/generate/generate-pages-json.js';
+export { renderUpwToUniPagesJson } from './compiler/generate/pages-json.js';
 export { resolveProjectPaths, resolveUpwProjectPaths } from './config/paths.js';
 export type {
   BuildUniPagesJsonFromUpwSourceOptions,
@@ -23,5 +23,5 @@ export type {
 export type {
   RenderUpwToUniPagesJsonInput,
   RenderUpwWorkspaceData,
-} from './compiler/generate/generate-pages-json.js';
+} from './compiler/generate/pages-json.js';
 export type { ProjectPaths, ResolveUpwProjectOptions, UniAppProjectMode } from './config/paths.js';

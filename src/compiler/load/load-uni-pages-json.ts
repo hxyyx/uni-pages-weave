@@ -7,7 +7,7 @@ import {
 } from '../../schemas/uni-pages.js';
 import { parseJsonLike } from '../../utils/json.js';
 import type { ParsedUniPagesJson } from '../types.js';
-import { createPagesJsonParseSession, normalizePagesJsonComments } from './condition-comments.js';
+import { createPagesJsonParseSession, normalizePagesJsonComments } from '../conditions/session.js';
 
 function normalizeCompatSubPackages(data: Record<string, unknown>): Record<string, unknown> {
   const hasSubPackages = Object.prototype.hasOwnProperty.call(data, UNI_SUB_PACKAGES_KEY);

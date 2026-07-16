@@ -7,7 +7,7 @@ import {
   resolveUpwBuildContext,
   resolveUpwToUniContext,
 } from '../load/load-upw-workspace.js';
-import { runUpwToUniBuild } from './output-pages-json.js';
+import { runUpwToUniBuild } from './pages-json-file.js';
 
 export type WatchUniPagesJsonFromUpwSourceOptions = BuildUniPagesJsonFromUpwSourceOptions;
 

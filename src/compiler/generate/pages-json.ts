@@ -7,7 +7,7 @@ import {
   convertUpwAppFragmentToUniObject,
   convertUpwPageFragmentToUniPageEntry,
 } from '../utils/upw-page-fragments.js';
-import { buildUniPagesJsonWorkspaceFromUpwData } from '../transform/upw-to-uni-workspace.js';
+import { buildUniPagesJsonWorkspaceFromUpwData } from '../upw-to-uni/build-render-workspace.js';
 import { isConditionalPageEntry } from '../analyze/analyze-upw-workspace.js';
 import type { BuildSubPackage, OutputPage, RenderUpwWorkspaceData } from '../types.js';
 import {
@@ -15,7 +15,7 @@ import {
   emitConditionalValue,
   emitValue,
   type ConditionalMeta,
-} from './condition-emitter.js';
+} from './jsonc-emitter.js';
 
 export type { BuildSubPackage, OutputPage, RenderUpwWorkspaceData } from '../types.js';
 
