@@ -1,13 +1,13 @@
 import { watch, type FSWatcher } from 'chokidar';
 
 import { UNI_PAGES_JSON_FILE } from '../../schemas/uni-pages.js';
-import { logger } from '../../logger.js';
+import { logger } from '../../utils/logger.js';
 import {
   type BuildUniPagesJsonFromUpwSourceOptions,
   resolveUpwBuildContext,
   resolveUpwToUniContext,
 } from '../load/load-upw-workspace.js';
-import { runUpwToUniBuild } from './write-pages-json.js';
+import { runUpwToUniBuild } from './output-pages-json.js';
 
 export type WatchUniPagesJsonFromUpwSourceOptions = BuildUniPagesJsonFromUpwSourceOptions;
 

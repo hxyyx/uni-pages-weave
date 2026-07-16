@@ -7,6 +7,25 @@ settings:
 importers:
 
   .:
+    dependencies:
+      chokidar:
+        specifier: ^4.0.0
+        version: 4.0.3
+      commander:
+        specifier: ^12.0.0
+        version: 12.0.0
+      fs-extra:
+        specifier: ^11.2.0
+        version: 11.3.6
+      jsonc-parser:
+        specifier: ^3.3.1
+        version: 3.3.1
+      lodash-es:
+        specifier: ^4.17.21
+        version: 4.18.1
+      picocolors:
+        specifier: ^1.1.1
+        version: 1.1.1
     devDependencies:
       '@eslint/js':
         specifier: ^9.0.0
@@ -14,15 +33,18 @@ importers:
       '@inquirer/prompts':
         specifier: ^7.0.0
         version: 7.0.0(@types/node@20.19.43)
+      '@types/fs-extra':
+        specifier: ^11.0.4
+        version: 11.0.4
+      '@types/lodash-es':
+        specifier: ^4.17.12
+        version: 4.17.12
       '@types/node':
         specifier: ^20.0.0
         version: 20.19.43
       eslint:
         specifier: ^9.0.0
         version: 9.39.4
-      fs-extra:
-        specifier: ^11.2.0
-        version: 11.3.6
       globals:
         specifier: ^15.0.0
         version: 15.0.0
@@ -41,40 +63,6 @@ importers:
       typescript-eslint:
         specifier: ^8.0.0
         version: 8.62.1(eslint@9.39.4)(typescript@5.4.2)
-
-  packages/cli:
-    dependencies:
-      '@uni-pages-weave/core':
-        specifier: workspace:*
-        version: link:../core
-      commander:
-        specifier: ^12.0.0
-        version: 12.0.0
-
-  packages/core:
-    dependencies:
-      chokidar:
-        specifier: ^4.0.0
-        version: 4.0.3
-      fs-extra:
-        specifier: ^11.2.0
-        version: 11.3.6
-      jsonc-parser:
-        specifier: ^3.3.1
-        version: 3.3.1
-      lodash-es:
-        specifier: ^4.17.21
-        version: 4.18.1
-      picocolors:
-        specifier: ^1.1.1
-        version: 1.1.1
-    devDependencies:
-      '@types/fs-extra':
-        specifier: ^11.0.4
-        version: 11.0.4
-      '@types/lodash-es':
-        specifier: ^4.17.12
-        version: 4.17.12
 
 packages:
 
