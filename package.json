@@ -24,17 +24,21 @@
   ],
   "scripts": {
     "build": "tsup",
-    "verify": "pnpm run build && pnpm run lint && pnpm run test",
+    "verify": "pnpm run build && pnpm run lint && pnpm run package:check && pnpm run smoke:cli && pnpm run pack:dry",
+    "verify:full": "pnpm run verify && pnpm run test",
     "test": "pnpm run test:unit && pnpm run test:integration && pnpm run test:e2e",
     "test:unit": "tsx --test \"tests/unit/**/*.test.ts\"",
     "test:integration": "node ./tests/integration/test.mjs",
     "test:e2e": "node ./tests/e2e/test.mjs",
     "test:clear": "node ./tests/clear.mjs",
-    "lint": "eslint src",
-    "format": "prettier \"src/**/*.{js,mjs,cjs,ts,tsx,json,md}\" --write",
-    "format:check": "prettier \"src/**/*.{js,mjs,cjs,ts,tsx,json,md}\" --check",
-    "release": "node ./scripts/release.mjs",
-    "version:check": "node ./scripts/check-version-sync.mjs"
+    "lint": "eslint src scripts",
+    "format": "prettier \"src/**/*.{js,mjs,cjs,ts,tsx,json,md}\" \"scripts/**/*.mjs\" --write",
+    "format:check": "prettier \"src/**/*.{js,mjs,cjs,ts,tsx,json,md}\" \"scripts/**/*.mjs\" --check",
+    "package:check": "node ./scripts/check-package.mjs",
+    "pack:dry": "pnpm pack --dry-run",
+    "smoke:cli": "node ./bin/index.js --version && node ./bin/index.js --help",
+    "prepack": "pnpm run build && pnpm run package:check",
+    "release": "node ./scripts/release.mjs"
   },
   "dependencies": {
     "chokidar": "^4.0.0",
